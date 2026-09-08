@@ -111,7 +111,13 @@ async fn matcher(state: Arc<AppState>, params: RuleParams, mut events: mpsc::Rec
                     window.len(),
                 );
                 match decision {
-                    Ok(()) => jobs.push((device.id.clone(), device.apns_token.clone(), key)),
+                    Ok(()) => jobs.push((
+                        device.id.clone(),
+                        device.apns_token.clone(),
+                        key,
+                        matched.callsign.clone(),
+                        matched.label.clone(),
+                    )),
                     Err(Suppression::Cooldown) | Err(Suppression::Inactive) => {}
                     Err(reason) => {
                         tracing::debug!(call = %event.source_call, ?reason, "suppressed");
@@ -120,19 +126,34 @@ async fn matcher(state: Arc<AppState>, params: RuleParams, mut events: mpsc::Rec
             }
         }
 
-        for (device_id, token, key) in jobs {
+        for (device_id, token, key, watch_call, watch_label) in jobs {
             let Some(push) = state.push.as_ref() else {
                 tracing::info!(call = %event.source_call, "match (push disabled)");
                 continue;
             };
+            // Open Terminal (app-only) transmissions ship a blank SourceCall;
+            // the watch knows who it matched, so fall back to its own data
+            let call = if event.source_call.is_empty() {
+                if watch_call.is_empty() {
+                    format!("DMR {}", event.source_id)
+                } else {
+                    watch_call
+                }
+            } else {
+                event.source_call.clone()
+            };
+            let name = event
+                .source_name
+                .clone()
+                .or_else(|| (!watch_label.is_empty()).then(|| watch_label.clone()));
             let payload = build_payload(
-                &event.source_call,
-                event.source_name.as_deref(),
+                &call,
+                name.as_deref(),
                 event.source_id,
                 event.destination_id,
                 event.destination_name.as_deref(),
             );
-            let collapse = format!("buddy-{}", event.source_call);
+            let collapse = format!("buddy-{call}");
             match push.send(&token, &payload, &collapse).await {
                 SendOutcome::Delivered => {
                     tracing::info!(call = %event.source_call, tg = event.destination_id,
