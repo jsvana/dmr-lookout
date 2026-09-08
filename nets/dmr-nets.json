@@ -1,0 +1,1679 @@
+{
+ "version": 1,
+ "nets": [
+  {
+   "id": "fe5fe20e-dee8-5860-9382-c35fa129453d",
+   "name": "1900 Net",
+   "network": "TGIF",
+   "talkgroup": 45768,
+   "weekdays": [
+    4
+   ],
+   "hour": 19,
+   "minute": 0,
+   "timeZoneID": "America/Phoenix",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF Network TG 45768 or 50853 \u2014 via dvnets.com/nets/1900-net"
+  },
+  {
+   "id": "ac9b549d-6988-573c-8ca1-f5cb51857a7d",
+   "name": "2 Meter Crew Anti-Net",
+   "network": "DMR",
+   "talkgroup": 317411,
+   "weekdays": [
+    4
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/Los_Angeles",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "317411, 31062 \u2014 via dvnets.com/nets/2-meter-crew-anti-net"
+  },
+  {
+   "id": "f4c944f6-00e0-5d15-ae38-157d47cd06df",
+   "name": "235 Alive - aLL wELCOME",
+   "network": "TGIF",
+   "talkgroup": 235,
+   "weekdays": [
+    1
+   ],
+   "hour": 19,
+   "minute": 30,
+   "timeZoneID": "Europe/London",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 235, ADN 235 \u2014 via dvnets.com/nets/235-alive-1722265229"
+  },
+  {
+   "id": "97c00369-230b-5666-a485-4e004aea486e",
+   "name": "235 Alive Net",
+   "network": "TGIF",
+   "talkgroup": 235,
+   "weekdays": [
+    1
+   ],
+   "hour": 18,
+   "minute": 30,
+   "timeZoneID": "UTC",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF TG 235 \u2014 via dvnets.com/nets/235-alive-net"
+  },
+  {
+   "id": "fbc3e8a5-754b-5bcf-9083-b8611662898f",
+   "name": "5 Hills 325 Net",
+   "network": "TGIF",
+   "talkgroup": 28100,
+   "weekdays": [
+    2
+   ],
+   "hour": 15,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 28100 \u2014 via dvnets.com/nets/5-hills-325-net"
+  },
+  {
+   "id": "b735dd6b-e7be-5127-8371-9e9a6c82601a",
+   "name": "Absolute Tech Net",
+   "network": "TGIF",
+   "talkgroup": 326,
+   "weekdays": [
+    3
+   ],
+   "hour": 19,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 326 \u2014 via dvnets.com/nets/absolute-tech-net"
+  },
+  {
+   "id": "62b51144-c1c8-503a-992a-de91850c2b95",
+   "name": "AFC Amateurs for Christ Net",
+   "network": "TGIF",
+   "talkgroup": 172,
+   "weekdays": [
+    1
+   ],
+   "hour": 15,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF TG 172 \u2014 via dvnets.com/nets/afc-amateurs-for-christ-net"
+  },
+  {
+   "id": "b48d1aa5-742f-57f6-95f8-2833a40a4204",
+   "name": "All Nodes Net",
+   "network": "TGIF",
+   "talkgroup": 6633,
+   "weekdays": [
+    2
+   ],
+   "hour": 18,
+   "minute": 0,
+   "timeZoneID": "America/Los_Angeles",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 6633 \u2014 via dvnets.com/nets/all-node-net"
+  },
+  {
+   "id": "898c7128-e194-5515-978b-fce1065e8224",
+   "name": "Alliance Net",
+   "network": "TGIF",
+   "talkgroup": 2969,
+   "weekdays": [
+    4
+   ],
+   "hour": 21,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 2969 \u2014 via dvnets.com/nets/alliance-net"
+  },
+  {
+   "id": "ee9c0a3a-e1c2-57a4-9b32-14dc0efdf49b",
+   "name": "Aloha DMR Net",
+   "network": "BrandMeister",
+   "talkgroup": 31002,
+   "weekdays": [
+    4
+   ],
+   "hour": 19,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 31002 \u2014 via dvnets.com/nets/aloha-dmr-net-1672878755"
+  },
+  {
+   "id": "1e81c375-6319-5117-99e7-0965fe371569",
+   "name": "AMSAT-Twitter Meet-up Net",
+   "network": "BrandMeister",
+   "talkgroup": 98006,
+   "weekdays": [
+    4
+   ],
+   "hour": 21,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "BrandMeister 98006 \u2014 via dvnets.com/nets/amsat-twitter-meet-up-net"
+  },
+  {
+   "id": "b6f75beb-c8ee-5fc6-86ae-664e7f68ef6a",
+   "name": "Arrow DMR Net",
+   "network": "BrandMeister",
+   "talkgroup": 3126,
+   "weekdays": [
+    7
+   ],
+   "hour": 19,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 3126 \u2014 via dvnets.com/nets/arrow-dmr-net"
+  },
+  {
+   "id": "eb0d077d-8e7a-5494-9216-92a34c21f45d",
+   "name": "AuxComm USA Multi-Mode Net",
+   "network": "TGIF",
+   "talkgroup": 11911,
+   "weekdays": [
+    5
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/Detroit",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 11911 \u2014 via dvnets.com/nets/auxcomm-usa-multi-mode-net"
+  },
+  {
+   "id": "ce18271d-9430-5801-bd9b-bf591fd9fdfc",
+   "name": "BARRA TECHNICAL AND INFORMATION NET",
+   "network": "BrandMeister",
+   "talkgroup": 3167813,
+   "weekdays": [
+    4
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister TG 3167813 \u2014 via dvnets.com/nets/barra-technical-and-information-net"
+  },
+  {
+   "id": "3d7d416b-0d75-5a96-8093-c0bf3cc595bd",
+   "name": "BayNet DMR, Fusion, and Workbench Podcast net",
+   "network": "BrandMeister",
+   "talkgroup": 31075,
+   "weekdays": [
+    5
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/Los_Angeles",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 31075 \u2014 via dvnets.com/nets/baynet-dmr-fusion-and-workbench-podcast-net"
+  },
+  {
+   "id": "16b42261-d20f-503d-a171-b149c72c6431",
+   "name": "Boredom Breaker",
+   "network": "TGIF",
+   "talkgroup": 49562,
+   "weekdays": [
+    3
+   ],
+   "hour": 12,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 49562 \u2014 via dvnets.com/nets/boredom-breaker"
+  },
+  {
+   "id": "cbd9273d-edec-506b-bc7f-9f1f7d445cec",
+   "name": "BrainWaves Not-A-Net",
+   "network": "DMR",
+   "talkgroup": 311037,
+   "weekdays": [
+    2
+   ],
+   "hour": 19,
+   "minute": 30,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "311037 \u2014 via dvnets.com/nets/brainwaves-not-a-net"
+  },
+  {
+   "id": "1b426d3c-6421-5647-9a7b-a9d1213d5386",
+   "name": "Brandmeister Worldwide Net",
+   "network": "BrandMeister",
+   "talkgroup": 93,
+   "weekdays": [
+    7
+   ],
+   "hour": 15,
+   "minute": 0,
+   "timeZoneID": "UTC",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister TG 93 \u2014 via dvnets.com/nets/brandmeister-worldwide-net"
+  },
+  {
+   "id": "61ef0d79-1ee5-55ba-bb40-0dec11afc785",
+   "name": "Central Savannah River Area Roundtable",
+   "network": "TGIF",
+   "talkgroup": 8014,
+   "weekdays": [
+    7
+   ],
+   "hour": 13,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 8014 \u2014 via dvnets.com/nets/central-savannah-river-area-roundtable"
+  },
+  {
+   "id": "5ef9c78a-2588-5658-915e-6fc66dc5d2d1",
+   "name": "Chaosrunde",
+   "network": "BrandMeister",
+   "talkgroup": 2630002,
+   "weekdays": [
+    4
+   ],
+   "hour": 19,
+   "minute": 30,
+   "timeZoneID": "UTC",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 2630002, TGIF 7337 \u2014 via dvnets.com/nets/chaosrunde-1670989524"
+  },
+  {
+   "id": "0aaf9b86-3a67-5459-b00a-cce563581c31",
+   "name": "Colorado HD Net",
+   "network": "BrandMeister",
+   "talkgroup": 31088,
+   "weekdays": [
+    6
+   ],
+   "hour": 19,
+   "minute": 30,
+   "timeZoneID": "America/Denver",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 31088 \u2014 via dvnets.com/nets/colorado-hd-net"
+  },
+  {
+   "id": "0b5d5efd-0364-58eb-8817-2c8e0242b3d5",
+   "name": "CSRA Multimode Tech Net",
+   "network": "TGIF",
+   "talkgroup": 43389,
+   "weekdays": [
+    7
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TG 43389 Southeast Link (AmComm, TGIF and QRM DMR Networks) \u2014 via dvnets.com/nets/csra-multimode-tech-net"
+  },
+  {
+   "id": "94871a69-8216-52ed-971b-96f40c78e447",
+   "name": "David &amp; Friends",
+   "network": "DMR",
+   "talkgroup": 313136,
+   "weekdays": [
+    2
+   ],
+   "hour": 7,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "313136 \u2014 via dvnets.com/nets/david-friends-1734312454"
+  },
+  {
+   "id": "955764b9-2519-5a82-8af9-ac10df4cf5dc",
+   "name": "David &amp; Friends",
+   "network": "BrandMeister",
+   "talkgroup": 313136,
+   "weekdays": [
+    2
+   ],
+   "hour": 7,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 313136 \u2014 via dvnets.com/nets/david-friends"
+  },
+  {
+   "id": "77cacdef-7c04-57fd-808e-6743b9203f1b",
+   "name": "Dialog with Don",
+   "network": "DMR",
+   "talkgroup": 313136,
+   "weekdays": [
+    2
+   ],
+   "hour": 9,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "313136 \u2014 via dvnets.com/nets/dialog-with-don"
+  },
+  {
+   "id": "0b364ac1-6582-58ce-a506-e980a7ad5da5",
+   "name": "DMR Arkansas Amateur Radio Net",
+   "network": "DMR",
+   "talkgroup": 3105,
+   "weekdays": [
+    3
+   ],
+   "hour": 21,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "3105 \u2014 via dvnets.com/nets/dmr-arkansas-amateur-radio-net"
+  },
+  {
+   "id": "98f7c13d-3280-506b-89fe-48b80b91588e",
+   "name": "DMR Tech Net",
+   "network": "BrandMeister",
+   "talkgroup": 3126,
+   "weekdays": [
+    2
+   ],
+   "hour": 19,
+   "minute": 45,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 3126 \u2014 via dvnets.com/nets/dmr-tech-net"
+  },
+  {
+   "id": "7e4cca7f-d5fb-5677-a8d4-f88bf52ddd27",
+   "name": "DRAG-NET",
+   "network": "BrandMeister",
+   "talkgroup": 31623,
+   "weekdays": [
+    1
+   ],
+   "hour": 19,
+   "minute": 30,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister TG# 31623 \u2014 via dvnets.com/nets/drag-net"
+  },
+  {
+   "id": "15d6e3f0-073d-51ef-894d-11b2fe87a93a",
+   "name": "DV Scotland Phoenix : Monday Night Net",
+   "network": "DMR",
+   "talkgroup": 23556,
+   "weekdays": [
+    2
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "Europe/London",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "DV Scotland Phoenix,Talk Group 23556 - Time Slot 2 \u2014 via dvnets.com/nets/dv-scotland-s-multi-mode-net"
+  },
+  {
+   "id": "60e7a5ae-364e-5770-89f2-2290bad25495",
+   "name": "ECR Tech Net",
+   "network": "BrandMeister",
+   "talkgroup": 9050,
+   "weekdays": [
+    3
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "DMR TGIF (prime.tgif.network) \u2022 TG 9050, DMR BrandMeister (www.brandmeister.network) \u2022 TG 3129973 \u2014 via dvnets.com/nets/ecr-tech-net"
+  },
+  {
+   "id": "d9a12ae5-3138-5d20-b310-b9d7926173bb",
+   "name": "Emergency Radio Long Island Ecomm-chew",
+   "network": "TGIF",
+   "talkgroup": 11710,
+   "weekdays": [
+    3
+   ],
+   "hour": 20,
+   "minute": 10,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 11710 \u2014 via dvnets.com/nets/emergency-radio-long-island-ragchew"
+  },
+  {
+   "id": "a01f25ff-7e19-581d-b280-de80e1067d31",
+   "name": "EPARA DMR Rag Chew",
+   "network": "BrandMeister",
+   "talkgroup": 3149822,
+   "weekdays": [
+    4
+   ],
+   "hour": 20,
+   "minute": 30,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "DMR Rag Chew, Brandmeister, TG 3149822 \u2014 via dvnets.com/nets/epara-dmr-rag-chew"
+  },
+  {
+   "id": "c1f4bc10-9f33-5ae3-8c45-ddc1d06a87ed",
+   "name": "FediHams Net",
+   "network": "BrandMeister",
+   "talkgroup": 2630002,
+   "weekdays": [
+    1
+   ],
+   "hour": 22,
+   "minute": 0,
+   "timeZoneID": "UTC",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 2630002, TGIF 7337 \u2014 via dvnets.com/nets/fedihams-net-1670986284"
+  },
+  {
+   "id": "704be293-ede3-5212-a7c1-99b5a41d478e",
+   "name": "First Responders Net",
+   "network": "TGIF",
+   "talkgroup": 90220,
+   "weekdays": [
+    6
+   ],
+   "hour": 19,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 90220, Amcomm 31364 \u2014 via dvnets.com/nets/first-responders-net"
+  },
+  {
+   "id": "62a600fc-ac06-527e-b2fb-5ac2a51194f5",
+   "name": "FreeSTAR Fright Night Halloween Net!",
+   "network": "TGIF",
+   "talkgroup": 23426,
+   "weekdays": [
+    6
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "UTC",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 23426 \u2014 via dvnets.com/nets/freestar-fright-night"
+  },
+  {
+   "id": "6eccb618-4d39-5a11-9a97-f767287959ef",
+   "name": "FRIDAY NIGHT TECK NET",
+   "network": "DMR",
+   "talkgroup": 235175,
+   "weekdays": [
+    6
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "Europe/London",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "235175 \u2014 via dvnets.com/nets/friday-night-teck-net-host-2e0wlf"
+  },
+  {
+   "id": "a94e9e5a-643e-58fb-adf6-5a27c24856be",
+   "name": "GB2RS News + Net - Clydebank",
+   "network": "DMR",
+   "talkgroup": 23559,
+   "weekdays": [
+    1
+   ],
+   "hour": 10,
+   "minute": 0,
+   "timeZoneID": "Europe/London",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Talk Group 23559 - Time Slot 2 \u2014 via dvnets.com/nets/gb2rs-news-net-clydebank"
+  },
+  {
+   "id": "5b9d73f3-ffa8-5890-8323-cbeb4014aaa1",
+   "name": "Georgia DMR Weekly Net",
+   "network": "BrandMeister",
+   "talkgroup": 3113,
+   "weekdays": [
+    4
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 3113 \u2014 via dvnets.com/nets/georgia-dmr-weekly-net"
+  },
+  {
+   "id": "cc0ce4c8-311a-5132-baf6-6b57a6606bff",
+   "name": "Ham helpers",
+   "network": "DMR",
+   "talkgroup": 15153,
+   "weekdays": [
+    7
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "UTC",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "15153 , 31465 , 312371 \u2014 via dvnets.com/nets/ham-helpers"
+  },
+  {
+   "id": "7efd5f41-a124-5613-8975-6d75b760dc59",
+   "name": "Handiham Radio Club Net",
+   "network": "BrandMeister",
+   "talkgroup": 31990,
+   "weekdays": [
+    4
+   ],
+   "hour": 19,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 31990, TGIF 3141 \u2014 via dvnets.com/nets/handiham-radio-club-net"
+  },
+  {
+   "id": "a989e404-9208-5e2b-84bc-0ccabf8165e2",
+   "name": "Happy Hour - The &quot;un-net&quot;",
+   "network": "DMR",
+   "talkgroup": 31555,
+   "weekdays": [
+    2
+   ],
+   "hour": 17,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "IPSC2 network C-Land, Talkgroup 31555 \u2014 via dvnets.com/nets/happy-hour-the-un-net"
+  },
+  {
+   "id": "94049a6e-4e94-52fa-82cf-45c04d1cdc91",
+   "name": "Happy Hour on 11 Cats",
+   "network": "TGIF",
+   "talkgroup": 172,
+   "weekdays": [
+    6
+   ],
+   "hour": 18,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF TG 172 \u2014 via dvnets.com/nets/happy-hour-on-11-cats"
+  },
+  {
+   "id": "0449a651-eb0e-56f2-b2d1-19a305d0c0a4",
+   "name": "ILLINOIS MULTIMODE NET",
+   "network": "BrandMeister",
+   "talkgroup": 31171,
+   "weekdays": [
+    4
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "BRANDMEISTER 31171 TGIF 31171 \u2014 via dvnets.com/nets/illinois-multimode-net"
+  },
+  {
+   "id": "ff649466-f497-5912-8606-bf8ddd9867ad",
+   "name": "IRN KB1 Multimode net",
+   "network": "TGIF",
+   "talkgroup": 31320,
+   "weekdays": [
+    6
+   ],
+   "hour": 21,
+   "minute": 0,
+   "timeZoneID": "Europe/London",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "DMR (TGIF) - Talkgroup 31320 \u2014 via dvnets.com/nets/kb1-multimode-net"
+  },
+  {
+   "id": "d64abb05-e485-5228-bbde-992e076cd4e8",
+   "name": "Litter Box Lounge",
+   "network": "TGIF",
+   "talkgroup": 172,
+   "weekdays": [
+    7
+   ],
+   "hour": 18,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF TG 172 \u2014 via dvnets.com/nets/litter-box-lounge"
+  },
+  {
+   "id": "731361a3-7b98-5e19-b86e-216578035cbe",
+   "name": "Lunch Bunch",
+   "network": "DMR",
+   "talkgroup": 312128,
+   "weekdays": [
+    2
+   ],
+   "hour": 12,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "312128 \u2014 via dvnets.com/nets/lunch-bunch"
+  },
+  {
+   "id": "8f1d3e66-8a22-59fe-b9cf-ba4f0cc0bd9d",
+   "name": "Mid Lanarkshire Amateur Radio Society",
+   "network": "DMR",
+   "talkgroup": 23550,
+   "weekdays": [
+    4
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "Europe/London",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Talkgroup 23550 \u2014 via dvnets.com/nets/mid-lanarkshire-amateur-radio-society"
+  },
+  {
+   "id": "539e0baf-782f-501d-aa9f-d671a862c5ca",
+   "name": "Narwhal Amateur Radio Society Club Net",
+   "network": "TGIF",
+   "talkgroup": 969,
+   "weekdays": [
+    3
+   ],
+   "hour": 19,
+   "minute": 0,
+   "timeZoneID": "America/Los_Angeles",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "FreeDMG TG 969, TGIF TG 2969, FreeStar TG 969 on System X \u2014 via dvnets.com/nets/narwhal-amateur-radio-society-club-net"
+  },
+  {
+   "id": "eb83fc5b-8adb-500c-bbe2-3af4a0697dc9",
+   "name": "New Mexico Multi-Mode Net",
+   "network": "TGIF",
+   "talkgroup": 31918,
+   "weekdays": [
+    4
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/Denver",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF Network 31918 \u2014 via dvnets.com/nets/new-mexico-ysf-reflector-net"
+  },
+  {
+   "id": "951d9a20-f1ee-563c-804a-1249ed91f411",
+   "name": "NUTS Digital Net",
+   "network": "DMR",
+   "talkgroup": 314901,
+   "weekdays": [
+    1
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/Denver",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "AmComm 314901 \u2014 via dvnets.com/nets/nuts-d-star-net"
+  },
+  {
+   "id": "2db1c6ec-56b8-5345-b118-5d8986209657",
+   "name": "Paisley Amateur Radio Club",
+   "network": "DMR",
+   "talkgroup": 4415,
+   "weekdays": [
+    3
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "Europe/London",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "4415 \u2014 via dvnets.com/nets/paisley-amateur-radio-club"
+  },
+  {
+   "id": "619a1c6a-c338-508e-94fb-3958cd5dff5a",
+   "name": "PAPA Tech Roundtable Net",
+   "network": "DMR",
+   "talkgroup": 31078,
+   "weekdays": [
+    5
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/Los_Angeles",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "31078 \u2014 via dvnets.com/nets/papa-tech-roundtable-net"
+  },
+  {
+   "id": "6b764870-48e3-5186-83b3-da45be7eab24",
+   "name": "PARC Chit Chat Net",
+   "network": "DMR",
+   "talkgroup": 30252,
+   "weekdays": [
+    1
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/Regina",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "30252 \u2014 via dvnets.com/nets/parc-chit-chat-net"
+  },
+  {
+   "id": "a11de0aa-e9d9-569c-afea-9d71fb69d09d",
+   "name": "Parks On The Air (POTA) Net",
+   "network": "BrandMeister",
+   "talkgroup": 313136,
+   "weekdays": [
+    2
+   ],
+   "hour": 18,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 313136 \u2014 via dvnets.com/nets/parks-on-the-air-pota-net"
+  },
+  {
+   "id": "38e1edaf-8a66-5ba1-966f-66f0880de4ab",
+   "name": "Quarter Century Wireless Association Sunflower Net",
+   "network": "TGIF",
+   "talkgroup": 31207,
+   "weekdays": [
+    7
+   ],
+   "hour": 10,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 31207 \u2014 via dvnets.com/nets/quarter-century-wireless-association-sunflower-net"
+  },
+  {
+   "id": "89345be1-134f-563f-ae5c-3a4f4f6c86d0",
+   "name": "RadioSC Digital Dog Multimode Net",
+   "network": "TGIF",
+   "talkgroup": 517,
+   "weekdays": [
+    2
+   ],
+   "hour": 17,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Quadnet TG 517, TGIF TG 517, XLX_517 Module A \u2014 via dvnets.com/nets/digital-dog-islander-amateur-radio-association"
+  },
+  {
+   "id": "222995d8-c5ef-53e2-939a-f7ef3abf9023",
+   "name": "RadioSC Salty Dog Multimode Net",
+   "network": "TGIF",
+   "talkgroup": 517,
+   "weekdays": [
+    2
+   ],
+   "hour": 17,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Quadnet TG 517; TGIF TG 517; XLX_517 Module A \u2014 via dvnets.com/nets/radiosc-urf517-multimode-digital-net"
+  },
+  {
+   "id": "0180f76d-451b-5967-bcfa-5b151f5b2a94",
+   "name": "ROC-HAM Radio Network POP-UP Net",
+   "network": "TGIF",
+   "talkgroup": 2585,
+   "weekdays": [
+    1
+   ],
+   "hour": 22,
+   "minute": 0,
+   "timeZoneID": "UTC",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "DMR TGIF Talk Group 2585, Extended Freedom SIP Portal 2585, M0XSV YorkshireSVX Reflector TG2585 \u2014 via dvnets.com/nets/roc-ham-radio-network-pop-up-net"
+  },
+  {
+   "id": "c94cb541-af4c-541d-bd41-179bb0c15d32",
+   "name": "Saint Max Net",
+   "network": "TGIF",
+   "talkgroup": 3814,
+   "weekdays": [
+    1
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 3814 Sundays immediately after the 40 Meter Net \u2014 via dvnets.com/nets/saint-max-net"
+  },
+  {
+   "id": "8854e2c4-371b-5197-ae93-5331abdfa3d0",
+   "name": "SCARSVOIP",
+   "network": "TGIF",
+   "talkgroup": 265,
+   "weekdays": [
+    7
+   ],
+   "hour": 8,
+   "minute": 0,
+   "timeZoneID": "America/Detroit",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF TG 265 \u2014 via dvnets.com/nets/scarsvoip"
+  },
+  {
+   "id": "724d27ec-e289-5494-bca8-4cf50232161b",
+   "name": "Science Net",
+   "network": "TGIF",
+   "talkgroup": 326,
+   "weekdays": [
+    7
+   ],
+   "hour": 21,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF TG 326 Fireside/DoDropin \u2014 via dvnets.com/nets/science-net"
+  },
+  {
+   "id": "3996c475-cd13-52da-9a35-1cb48bacdeaa",
+   "name": "SEFL DMR Tech Net",
+   "network": "DMR",
+   "talkgroup": 311037,
+   "weekdays": [
+    1
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "311037 \u2014 via dvnets.com/nets/sefl-dmr-tech-net"
+  },
+  {
+   "id": "eebe169a-2f03-571a-875c-db63a7a76e94",
+   "name": "Skywarn Youth &amp; Family Net",
+   "network": "BrandMeister",
+   "talkgroup": 31686,
+   "weekdays": [
+    1
+   ],
+   "hour": 19,
+   "minute": 30,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister TG: 31686 \u2014 via dvnets.com/nets/skywarn-youth-family-net"
+  },
+  {
+   "id": "dee98cfa-7a18-551b-a1c8-38e6301aee3c",
+   "name": "South East Louisiana 31225 Net",
+   "network": "BrandMeister",
+   "talkgroup": 31225,
+   "weekdays": [
+    3
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 31225 \u2014 via dvnets.com/nets/se-louisiana-31225-net"
+  },
+  {
+   "id": "2fbbbc01-0a62-5727-ba2d-ae7e285cc037",
+   "name": "Southern Tier NY Digital Voice Net",
+   "network": "BrandMeister",
+   "talkgroup": 31367,
+   "weekdays": [
+    1
+   ],
+   "hour": 19,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 31367 \u2014 via dvnets.com/nets/southern-tier-ny-digital-voice-net"
+  },
+  {
+   "id": "f30a7428-786c-5acd-a3a0-78a4611444b1",
+   "name": "Sunday Night UP Net",
+   "network": "BrandMeister",
+   "talkgroup": 31268,
+   "weekdays": [
+    1
+   ],
+   "hour": 18,
+   "minute": 30,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 31268 \u2014 via dvnets.com/nets/sunday-night-up-net"
+  },
+  {
+   "id": "2aceb0ad-e521-5a89-905b-af04959afb79",
+   "name": "SWLA - Link net (Louisiana)",
+   "network": "TGIF",
+   "talkgroup": 311995,
+   "weekdays": [
+    2
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Ham United 311995 TGIF 311995 Quadnet 311995 \u2014 via dvnets.com/nets/swla-link-net-louisiana"
+  },
+  {
+   "id": "24817333-7aba-5819-ad7a-9f9ea4760561",
+   "name": "TARA Statewide Net",
+   "network": "TGIF",
+   "talkgroup": 31473,
+   "weekdays": [
+    7
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TIGF TG 31473, AmComm 31473 \u2014 via dvnets.com/nets/tara-statewide-net"
+  },
+  {
+   "id": "39d564b0-dc12-5575-b4e9-d397d3ff7adf",
+   "name": "Tennessee Digital Amateur Radio Group DMR Net",
+   "network": "BrandMeister",
+   "talkgroup": 3147,
+   "weekdays": [
+    6
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 3147 \u2014 via dvnets.com/nets/tennessee-digital-amateur-radio-group-dmr-net"
+  },
+  {
+   "id": "478f49ad-b14b-58da-abb0-d2ebdac94e64",
+   "name": "The Diner",
+   "network": "BrandMeister",
+   "talkgroup": 313136,
+   "weekdays": [
+    2
+   ],
+   "hour": 4,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 313136 \u2014 via dvnets.com/nets/the-diner"
+  },
+  {
+   "id": "b37c7dd8-1721-5af5-be00-ab265d262e95",
+   "name": "The Friday Night CANNET Canadian D-Star &amp; Multi Digital Net",
+   "network": "DMR",
+   "talkgroup": 302050,
+   "weekdays": [
+    6
+   ],
+   "hour": 21,
+   "minute": 0,
+   "timeZoneID": "America/Toronto",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "DMR BN Talk group 302050 \u2014 via dvnets.com/nets/the-friday-night-cannet-candian-d-star-multi-digital-net"
+  },
+  {
+   "id": "482fd6b7-298e-51e2-892b-88940802cb1e",
+   "name": "The Friendship Net",
+   "network": "TGIF",
+   "talkgroup": 28100,
+   "weekdays": [
+    2
+   ],
+   "hour": 21,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 28100 \u2014 via dvnets.com/nets/the-friendship-net"
+  },
+  {
+   "id": "f6e665ad-d4b8-5e0b-aa1d-04d291262cd2",
+   "name": "The Little Event",
+   "network": "BrandMeister",
+   "talkgroup": 3121232,
+   "weekdays": [
+    4
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 3121232 \u2014 via dvnets.com/nets/the-little-event"
+  },
+  {
+   "id": "e79cecaa-e5ba-55da-aec4-9806d557d261",
+   "name": "The Morning Brew",
+   "network": "DMR",
+   "talkgroup": 3129973,
+   "weekdays": [
+    2
+   ],
+   "hour": 7,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "\u2022 TG 3129973 \u2014 via dvnets.com/nets/the-morning-brew"
+  },
+  {
+   "id": "14417d52-cdeb-5bf8-934d-4718d8e5f37d",
+   "name": "The Piedmont Link",
+   "network": "TGIF",
+   "talkgroup": 31458,
+   "weekdays": [
+    4
+   ],
+   "hour": 20,
+   "minute": 30,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "XLX056A scmidlands.network, TGIF TG 31458 \u2014 via dvnets.com/nets/the-piedmont-link"
+  },
+  {
+   "id": "a5a859a0-91fa-5c84-a86d-f46e1d17ba7c",
+   "name": "The Scanner/SWL Junkies Net",
+   "network": "TGIF",
+   "talkgroup": 1033,
+   "weekdays": [
+    5
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 1033 \u2014 via dvnets.com/nets/the-scanner-swl-junkies-net"
+  },
+  {
+   "id": "ace09b42-c7d6-55b1-a3f6-d2829ca8bc56",
+   "name": "The Shack Net",
+   "network": "BrandMeister",
+   "talkgroup": 3143216,
+   "weekdays": [
+    4
+   ],
+   "hour": 0,
+   "minute": 0,
+   "timeZoneID": "UTC",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 3143216, FreeDMR 31210 \u2014 via dvnets.com/nets/the-shack-net"
+  },
+  {
+   "id": "8fe94860-eb55-5fca-a2ec-fb0c3b40e004",
+   "name": "The South 40 Net Club",
+   "network": "TGIF",
+   "talkgroup": 45662,
+   "weekdays": [
+    3
+   ],
+   "hour": 21,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 45662 \u2014 via dvnets.com/nets/the-south-40-net"
+  },
+  {
+   "id": "60ed67dc-e1dc-577b-9fa1-2776c030e997",
+   "name": "The World Wide Check-In",
+   "network": "BrandMeister",
+   "talkgroup": 91,
+   "weekdays": [
+    7
+   ],
+   "hour": 16,
+   "minute": 0,
+   "timeZoneID": "UTC",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister Talk Group 91 World Wide \u2014 via dvnets.com/nets/world-wide-check-in"
+  },
+  {
+   "id": "66b17505-1cd2-5bbf-9374-6eaf3b8229b7",
+   "name": "Tidewater DMR Net",
+   "network": "BrandMeister",
+   "talkgroup": 31515,
+   "weekdays": [
+    5
+   ],
+   "hour": 21,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "BrandMeister 31515 \u2014 via dvnets.com/nets/tidewater-dmr-net"
+  },
+  {
+   "id": "a6bac36e-da4c-5fbd-a16d-1d4d52351cec",
+   "name": "VKDMR Net",
+   "network": "DMR",
+   "talkgroup": 505,
+   "weekdays": [
+    3
+   ],
+   "hour": 19,
+   "minute": 0,
+   "timeZoneID": "Australia/Adelaide",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "VKDMR Net TG 505 \u2014 via dvnets.com/nets/vkdmr-net"
+  },
+  {
+   "id": "eb1a1b63-8775-5841-9ac0-ba05e7db0053",
+   "name": "W5TSG TSG (Texas State Guard net)",
+   "network": "TGIF",
+   "talkgroup": 28100,
+   "weekdays": [
+    4
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "tgif 28100 \u2014 via dvnets.com/nets/w5tsg-tsg-texas-state-guard-net"
+  },
+  {
+   "id": "2543b8ea-8528-5551-a53b-96f904ffd4b4",
+   "name": "WARS Digital Disco",
+   "network": "DMR",
+   "talkgroup": 3171,
+   "weekdays": [
+    7
+   ],
+   "hour": 19,
+   "minute": 0,
+   "timeZoneID": "America/Denver",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "3171 \u2014 via dvnets.com/nets/wars-digital-disco"
+  },
+  {
+   "id": "a3dfc3ac-396f-5bd3-aecf-a870e2f723b7",
+   "name": "West TN Info Net",
+   "network": "DMR",
+   "talkgroup": 314710,
+   "weekdays": [
+    4
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "314710 \u2014 via dvnets.com/nets/west-tn-info-net-1782354821"
+  },
+  {
+   "id": "e182fd00-fd2f-5270-9feb-dd85f63a8525",
+   "name": "West TN Info Net",
+   "network": "DMR",
+   "talkgroup": 314710,
+   "weekdays": [
+    4
+   ],
+   "hour": 19,
+   "minute": 50,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "314710 \u2014 via dvnets.com/nets/west-tn-info-net"
+  },
+  {
+   "id": "25075661-f3be-5184-a2aa-2bd757307052",
+   "name": "WIA News",
+   "network": "TGIF",
+   "talkgroup": 50446,
+   "weekdays": [
+    1
+   ],
+   "hour": 21,
+   "minute": 30,
+   "timeZoneID": "Australia/Sydney",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 50446 \u2014 via dvnets.com/nets/wia-news"
+  },
+  {
+   "id": "1bac98ae-7e49-57ee-80b8-18578ee916f9",
+   "name": "Wichita Amateur Radio Club DMR NET",
+   "network": "DMR",
+   "talkgroup": 31204,
+   "weekdays": [
+    1
+   ],
+   "hour": 22,
+   "minute": 45,
+   "timeZoneID": "UTC",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "31204 \u2014 via dvnets.com/nets/warc-dmr-net"
+  },
+  {
+   "id": "ee11b9b4-5649-5cf2-bb1d-0d3780857719",
+   "name": "World Wide Check-In",
+   "network": "BrandMeister",
+   "talkgroup": 91,
+   "weekdays": [
+    7
+   ],
+   "hour": 16,
+   "minute": 0,
+   "timeZoneID": "UTC",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "Brandmeister 91 \u2014 via dvnets.com/nets/worldwidecheckin"
+  },
+  {
+   "id": "b778b2dd-093e-5905-b088-a9e0802de78d",
+   "name": "Worldwide PRIDE Net (also known as the Pride Radio Group Net)",
+   "network": "TGIF",
+   "talkgroup": 969,
+   "weekdays": [
+    1
+   ],
+   "hour": 2,
+   "minute": 0,
+   "timeZoneID": "UTC",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "FreeDMR TG 969, TGIF TG 2969, FreeSTAR TG 969 \u2014 via dvnets.com/nets/worldwide-pride-net-pride-radio-group-net"
+  },
+  {
+   "id": "71b9d925-d73d-5a4c-931b-612df311d915",
+   "name": "YACHT Youth Net",
+   "network": "TGIF",
+   "talkgroup": 54304,
+   "weekdays": [
+    2
+   ],
+   "hour": 19,
+   "minute": 0,
+   "timeZoneID": "America/Chicago",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 54304 \u2014 via dvnets.com/nets/yacht-youth-net"
+  },
+  {
+   "id": "d79ce08a-b39a-55df-83c3-cf3643111d14",
+   "name": "YARC Digital Net",
+   "network": "TGIF",
+   "talkgroup": 99846,
+   "weekdays": [
+    2
+   ],
+   "hour": 2,
+   "minute": 0,
+   "timeZoneID": "UTC",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 99846 \u2014 via dvnets.com/nets/yarc-digital-net"
+  },
+  {
+   "id": "826809f9-5db3-58f3-a27e-7271fd739027",
+   "name": "YLISSB System DMR Net",
+   "network": "TGIF",
+   "talkgroup": 319,
+   "weekdays": [
+    4
+   ],
+   "hour": 21,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 319 \u2014 via dvnets.com/nets/ylissb-system-dmr-net"
+  },
+  {
+   "id": "29e2ff73-4cb8-5069-9c51-c268ccfd3c2d",
+   "name": "Youth Net (East Coast Reflector)",
+   "network": "TGIF",
+   "talkgroup": 9050,
+   "weekdays": [
+    6
+   ],
+   "hour": 20,
+   "minute": 0,
+   "timeZoneID": "America/New_York",
+   "durationMin": 60,
+   "leads": [
+    10
+   ],
+   "enabled": false,
+   "notes": "TGIF 9050 \u2014 via dvnets.com/nets/ecr-youth-net"
+  }
+ ]
+}
