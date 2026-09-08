@@ -15,7 +15,7 @@ pub struct PushClient {
     key_id: String,
     team_id: String,
     bundle_id: String,
-    pub host: &'static str,
+
     http: reqwest::Client,
     jwt_cache: Mutex<Option<(String, i64)>>,
 }
@@ -40,17 +40,12 @@ impl PushClient {
             .map_err(|e| anyhow::anyhow!("reading APNs key {}: {e}", cfg.key_path))?;
         let key = EncodingKey::from_ec_pem(&pem)
             .map_err(|e| anyhow::anyhow!("parsing APNs .p8 key: {e}"))?;
-        let host = if cfg.production {
-            "api.push.apple.com"
-        } else {
-            "api.sandbox.push.apple.com"
-        };
+
         Ok(PushClient {
             key,
             key_id: cfg.key_id.clone(),
             team_id: cfg.team_id.clone(),
             bundle_id: cfg.bundle_id.clone(),
-            host,
             http: reqwest::Client::builder()
                 .timeout(std::time::Duration::from_secs(10))
                 .build()
@@ -84,13 +79,19 @@ impl PushClient {
         token: &str,
         payload: &serde_json::Value,
         collapse_id: &str,
+        env: &str,
     ) -> SendOutcome {
+        let host = if env == "production" {
+            "api.push.apple.com"
+        } else {
+            "api.sandbox.push.apple.com"
+        };
         let now = chrono::Utc::now().timestamp();
         let jwt = match self.jwt(now) {
             Ok(jwt) => jwt,
             Err(error) => return SendOutcome::Failed(format!("JWT sign failed: {error}")),
         };
-        let url = format!("https://{}/3/device/{token}", self.host);
+        let url = format!("https://{host}/3/device/{token}");
         let response = self
             .http
             .post(&url)
@@ -186,7 +187,6 @@ veKTfRGwsrK+uQR/lpLpNn6SZzuYnI9aXf8XgJa4WZrVLQ8A2KIKZKhW
             key_id: "KEY1234567".into(),
             team_id: "TEAM123456".into(),
             bundle_id: "com.carrierwave.DMRMonitor".into(),
-            host: "api.sandbox.push.apple.com",
             http: reqwest::Client::new(),
             jwt_cache: Mutex::new(None),
         }

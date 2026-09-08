@@ -25,7 +25,7 @@ pub async fn open(path: &str) -> anyhow::Result<SqlitePool> {
 
 pub async fn load_devices(pool: &SqlitePool) -> anyhow::Result<Vec<Device>> {
     let rows = sqlx::query(
-        "SELECT id, apns_token, quiet_start, quiet_end, tz FROM devices",
+        "SELECT id, apns_token, apns_env, quiet_start, quiet_end, tz FROM devices",
     )
     .fetch_all(pool)
     .await?;
@@ -34,6 +34,7 @@ pub async fn load_devices(pool: &SqlitePool) -> anyhow::Result<Vec<Device>> {
         .map(|row| Device {
             id: row.get("id"),
             apns_token: row.get("apns_token"),
+            apns_env: row.get("apns_env"),
             quiet_start: row.get("quiet_start"),
             quiet_end: row.get("quiet_end"),
             tz: row.get("tz"),
@@ -62,18 +63,20 @@ pub async fn upsert_device(
     pool: &SqlitePool,
     id: &str,
     apns_token: &str,
+    apns_env: &str,
     platform: &str,
     app_version: &str,
     now: i64,
 ) -> anyhow::Result<()> {
     sqlx::query(
-        "INSERT INTO devices (id, apns_token, platform, app_version, created_at, updated_at)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?5)
+        "INSERT INTO devices (id, apns_token, apns_env, platform, app_version, created_at, updated_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?6)
          ON CONFLICT(id) DO UPDATE SET
-           apns_token = ?2, platform = ?3, app_version = ?4, updated_at = ?5",
+           apns_token = ?2, apns_env = ?3, platform = ?4, app_version = ?5, updated_at = ?6",
     )
     .bind(id)
     .bind(apns_token)
+    .bind(apns_env)
     .bind(platform)
     .bind(app_version)
     .bind(now)
@@ -166,12 +169,4 @@ pub async fn record_push(
     .execute(pool)
     .await?;
     Ok(())
-}
-
-pub async fn device_token(pool: &SqlitePool, id: &str) -> anyhow::Result<Option<String>> {
-    let row = sqlx::query("SELECT apns_token FROM devices WHERE id = ?1")
-        .bind(id)
-        .fetch_optional(pool)
-        .await?;
-    Ok(row.map(|r| r.get("apns_token")))
 }

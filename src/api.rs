@@ -83,7 +83,7 @@ async fn health(State(state): State<Arc<AppState>>) -> Json<serde_json::Value> {
         "events_seen": state.feed.events_seen.load(Ordering::Relaxed),
         "devices": index.devices.len(),
         "watches": index.watch_count(),
-        "apns_host": state.push.as_ref().map(|p| p.host),
+        "apns_configured": state.push.is_some(),
         "uptime_secs": now - state.started_at,
         "version": env!("CARGO_PKG_VERSION"),
     }))
@@ -93,6 +93,8 @@ async fn health(State(state): State<Arc<AppState>>) -> Json<serde_json::Value> {
 struct RegisterBody {
     device_id: String,
     apns_token: String,
+    #[serde(default)]
+    apns_env: String,
     #[serde(default)]
     platform: String,
     #[serde(default)]
@@ -111,6 +113,7 @@ async fn register_device(
         &state.pool,
         &body.device_id,
         &body.apns_token,
+        if body.apns_env == "production" { "production" } else { "sandbox" },
         if body.platform.is_empty() { "ios" } else { &body.platform },
         &body.app_version,
         now,
@@ -211,12 +214,18 @@ async fn test_push(
     let Some(push) = state.push.as_ref() else {
         return (StatusCode::SERVICE_UNAVAILABLE, "push not configured").into_response();
     };
-    let token = match db::device_token(&state.pool, &device_id).await {
-        Ok(Some(token)) => token,
-        Ok(None) => return (StatusCode::NOT_FOUND, "unknown device").into_response(),
-        Err(_) => return StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+    let device = {
+        let index = state.index.read().await;
+        index.devices.get(&device_id).cloned()
     };
-    match push.send(&token, &build_test_payload(), "buddy-test").await {
+    let Some(device) = device else {
+        return (StatusCode::NOT_FOUND, "unknown device").into_response();
+    };
+    let token = device.apns_token.clone();
+    match push
+        .send(&token, &build_test_payload(), "buddy-test", &device.apns_env)
+        .await
+    {
         SendOutcome::Delivered => StatusCode::NO_CONTENT.into_response(),
         SendOutcome::DeadToken => {
             let _ = db::delete_device_by_token(&state.pool, &token).await;

@@ -31,8 +31,6 @@ pub struct PushConfig {
     pub key_id: String,
     pub team_id: String,
     pub bundle_id: String,
-    #[serde(default)]
-    pub production: bool,
 }
 
 #[derive(Deserialize, Clone)]

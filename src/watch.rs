@@ -27,6 +27,7 @@ impl Watch {
 pub struct Device {
     pub id: String,
     pub apns_token: String,
+    pub apns_env: String,
     pub quiet_start: Option<i64>,
     pub quiet_end: Option<i64>,
     pub tz: String,
@@ -201,6 +202,7 @@ mod tests {
         Device {
             id: "dev1".into(),
             apns_token: "tok".into(),
+            apns_env: "sandbox".into(),
             quiet_start: None,
             quiet_end: None,
             tz: String::new(),

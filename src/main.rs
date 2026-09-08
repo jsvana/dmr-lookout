@@ -32,7 +32,7 @@ async fn main() -> anyhow::Result<()> {
     let push_client = match &config.push {
         Some(push_config) => {
             let client = Arc::new(PushClient::from_config(push_config)?);
-            tracing::info!(host = client.host, "APNs configured");
+            tracing::info!("APNs configured (per-device sandbox/production routing)");
             Some(client)
         }
         None => {
@@ -114,6 +114,7 @@ async fn matcher(state: Arc<AppState>, params: RuleParams, mut events: mpsc::Rec
                     Ok(()) => jobs.push((
                         device.id.clone(),
                         device.apns_token.clone(),
+                        device.apns_env.clone(),
                         key,
                         matched.callsign.clone(),
                         matched.label.clone(),
@@ -126,7 +127,7 @@ async fn matcher(state: Arc<AppState>, params: RuleParams, mut events: mpsc::Rec
             }
         }
 
-        for (device_id, token, key, watch_call, watch_label) in jobs {
+        for (device_id, token, apns_env, key, watch_call, watch_label) in jobs {
             let Some(push) = state.push.as_ref() else {
                 tracing::info!(call = %event.source_call, "match (push disabled)");
                 continue;
@@ -154,7 +155,7 @@ async fn matcher(state: Arc<AppState>, params: RuleParams, mut events: mpsc::Rec
                 event.destination_name.as_deref(),
             );
             let collapse = format!("buddy-{call}");
-            match push.send(&token, &payload, &collapse).await {
+            match push.send(&token, &payload, &collapse, &apns_env).await {
                 SendOutcome::Delivered => {
                     tracing::info!(call = %event.source_call, tg = event.destination_id,
                         device = %device_id, "pushed");

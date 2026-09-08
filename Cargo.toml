@@ -1,6 +1,6 @@
 [package]
 name = "dmr-lookout"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 description = "BrandMeister buddy watch: follows the last-heard feed and pushes APNs notifications when watched callsigns key up"
 license = "MIT"
