@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install musl target
+        run: |
+          rustup target add x86_64-unknown-linux-musl
+          sudo apt-get update && sudo apt-get install -y musl-tools
+      - name: Build
+        run: cargo build --release --target x86_64-unknown-linux-musl
+      - name: Test
+        run: cargo test --release --target x86_64-unknown-linux-musl
+      - name: Package
+        run: |
+          version="${GITHUB_REF_NAME}"
+          mkdir -p dist
+          tar -czf "dist/dmr-lookout-${version}-x86_64-linux.tar.gz" \
+            -C target/x86_64-unknown-linux-musl/release dmr-lookout
+          shasum -a 256 dist/*.tar.gz > dist/checksums.txt
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.tar.gz
+            dist/checksums.txt

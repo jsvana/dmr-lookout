@@ -1,0 +1,28 @@
+# Copy to config.toml. The API bearer token comes from the environment:
+#   LOOKOUT_API_TOKEN=...   (required)
+#   LOOKOUT_CONFIG=...      (optional, path to this file)
+
+[server]
+bind = "127.0.0.1:8084"
+
+[feed]
+url = "wss://api.brandmeister.network/lh/socket.io/?EIO=4&transport=websocket"
+
+# Omit [push] to run without notifications (matches are logged only).
+[push]
+key_path = "apns_key.p8"
+key_id = "REPLACE_KEY_ID"
+team_id = "REPLACE_TEAM_ID"
+bundle_id = "com.carrierwave.DMRMonitor"
+# false = api.sandbox.push.apple.com, for dev-signed builds. A dev-signed
+# app's token sent to the production host is silently pruned as dead.
+production = false
+
+[rules]
+cooldown_secs = 1800
+max_pushes_per_hour = 12
+freshness_secs = 120
+connect_grace_secs = 10
+
+[db]
+path = "data/lookout.db"
