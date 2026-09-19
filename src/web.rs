@@ -23,6 +23,7 @@ pub fn router(state: Arc<AppState>) -> Router {
         .route("/watches/add", post(watch_add))
         .route("/watches/:id/update", post(watch_update))
         .route("/watches/:id/delete", post(watch_delete))
+        .route("/settings/notifications", post(notification_settings))
         .route("/history", get(history_page))
         .with_state(state)
 }
@@ -50,13 +51,15 @@ struct WatchesTemplate {
     email: String,
     flash: String,
     watches: Vec<WatchRow>,
+    notify_email: bool,
+    webhook_url: String,
 }
 
 struct HistoryView {
     when: String,
     buddy: String,
     talkgroup: String,
-    device: String,
+    via: String,
     outcome: String,
 }
 
@@ -259,11 +262,18 @@ async fn watches_page(
     };
     let flash = match query.flash.as_str() {
         "linked" => "Device linked — its watches were merged into this account.".to_string(),
+        "channels" => "Notification channels saved.".to_string(),
+        "badhook" => "Webhook URL must be a public http(s) address.".to_string(),
         _ => String::new(),
     };
+    let (notify_email, webhook_url) = db::account_channel_settings(&state.pool, session.account_id)
+        .await
+        .unwrap_or((false, String::new()));
     render(WatchesTemplate {
         email: session.email,
         flash,
+        notify_email,
+        webhook_url,
         watches: watches
             .into_iter()
             .map(|watch| WatchRow {
@@ -404,6 +414,104 @@ async fn watch_delete(
     Redirect::to("/").into_response()
 }
 
+// ---- Notification channels ----
+
+#[derive(Deserialize)]
+struct ChannelsForm {
+    #[serde(default)]
+    notify_email: String,
+    #[serde(default)]
+    webhook_url: String,
+}
+
+/// Reject non-http(s) and obviously private/loopback hosts — this URL is
+/// fetched by the server, so don't let it aim at internal services.
+fn valid_webhook(url: &str) -> bool {
+    let rest = match url.split_once("://") {
+        Some(("http" | "https", rest)) => rest,
+        _ => return false,
+    };
+    let host = rest
+        .split(['/', '?', '#'])
+        .next()
+        .unwrap_or("")
+        .rsplit('@')
+        .next()
+        .unwrap_or("")
+        .split(':')
+        .next()
+        .unwrap_or("")
+        .to_ascii_lowercase();
+    if host.is_empty() {
+        return false;
+    }
+    let private_prefixes = ["127.", "10.", "192.168.", "169.254.", "0."];
+    if host == "localhost"
+        || host == "::1"
+        || host.starts_with('[')
+        || private_prefixes.iter().any(|p| host.starts_with(p))
+    {
+        return false;
+    }
+    // 172.16.0.0/12
+    if let Some(second) = host.strip_prefix("172.").and_then(|r| r.split('.').next()) {
+        if second.parse::<u8>().is_ok_and(|n| (16..=31).contains(&n)) {
+            return false;
+        }
+    }
+    true
+}
+
+#[cfg(test)]
+mod tests {
+    use super::valid_webhook;
+
+    #[test]
+    fn webhook_validation() {
+        assert!(valid_webhook("https://example.com/hook"));
+        assert!(valid_webhook("http://ntfy.sh/mytopic"));
+        assert!(valid_webhook("https://user:pass@example.com:8443/x?y=1"));
+        assert!(!valid_webhook("ftp://example.com"));
+        assert!(!valid_webhook("example.com/hook"));
+        assert!(!valid_webhook("https://localhost/x"));
+        assert!(!valid_webhook("http://127.0.0.1:8084/x"));
+        assert!(!valid_webhook("http://10.1.2.3/x"));
+        assert!(!valid_webhook("http://192.168.1.5/x"));
+        assert!(!valid_webhook("http://172.20.0.1/x"));
+        assert!(valid_webhook("http://172.15.0.1/x"));
+        assert!(valid_webhook("http://172.32.0.1/x"));
+        assert!(!valid_webhook("http://[::1]/x"));
+        assert!(!valid_webhook("https://"));
+    }
+}
+
+async fn notification_settings(
+    State(state): State<Arc<AppState>>,
+    headers: HeaderMap,
+    Form(form): Form<ChannelsForm>,
+) -> Response {
+    let Some(session) = current_session(&state, &headers).await else {
+        return Redirect::to("/login").into_response();
+    };
+    let webhook_url = form.webhook_url.trim().to_string();
+    if !webhook_url.is_empty() && !valid_webhook(&webhook_url) {
+        return Redirect::to("/?flash=badhook").into_response();
+    }
+    let notify_email = form.notify_email == "on";
+    match db::set_account_channels(&state.pool, session.account_id, notify_email, &webhook_url)
+        .await
+    {
+        Ok(()) => {
+            let _ = state.rebuild_index().await;
+            Redirect::to("/?flash=channels").into_response()
+        }
+        Err(error) => {
+            tracing::error!(%error, "channel settings save failed");
+            StatusCode::INTERNAL_SERVER_ERROR.into_response()
+        }
+    }
+}
+
 // ---- History ----
 
 const HISTORY_PAGE_SIZE: i64 = 50;
@@ -457,7 +565,14 @@ async fn history_page(
                 } else {
                     format!("{} (TG {})", row.talkgroup_name, row.talkgroup)
                 },
-                device: row.device_id.chars().take(8).collect(),
+                via: if row.channel == "apns" {
+                    format!(
+                        "push · {}",
+                        row.device_id.chars().take(8).collect::<String>()
+                    )
+                } else {
+                    row.channel
+                },
                 outcome: row.outcome,
             })
             .collect(),

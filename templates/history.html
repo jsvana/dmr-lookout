@@ -9,7 +9,7 @@ out, it shows here.</p>
 {% else %}
 <table class="history">
   <thead>
-    <tr><th>When</th><th>Buddy</th><th>Talkgroup</th><th>Device</th><th>Status</th></tr>
+    <tr><th>When</th><th>Buddy</th><th>Talkgroup</th><th>Via</th><th>Status</th></tr>
   </thead>
   <tbody>
   {% for row in rows %}
@@ -17,7 +17,7 @@ out, it shows here.</p>
       <td data-label="When">{{ row.when }}</td>
       <td data-label="Buddy">{{ row.buddy }}</td>
       <td data-label="Talkgroup">{{ row.talkgroup }}</td>
-      <td data-label="Device">{{ row.device }}</td>
+      <td data-label="Via">{{ row.via }}</td>
       <td data-label="Status"><span class="badge {{ row.outcome }}">{{ row.outcome }}</span></td>
     </tr>
   {% endfor %}

@@ -23,6 +23,50 @@ impl Mailer {
         }
     }
 
+    /// A buddy-keyed-up notification email; same rate gates as pushes.
+    pub async fn send_notification(
+        &self,
+        to: &str,
+        buddy: &str,
+        talkgroup: &str,
+        history_url: &str,
+    ) -> anyhow::Result<()> {
+        match self {
+            Mailer::LogOnly => {
+                tracing::info!(%to, %buddy, "no LOOKOUT_RESEND_KEY; notification email logged only");
+                Ok(())
+            }
+            Mailer::Resend {
+                client,
+                api_key,
+                from,
+            } => {
+                let subject = format!("{buddy} keyed up on {talkgroup}");
+                let text = format!(
+                    "{buddy} keyed up on {talkgroup}.\n\n\
+                     History: {history_url}\n\n\
+                     Manage notification channels from the same page."
+                );
+                let response = client
+                    .post("https://api.resend.com/emails")
+                    .bearer_auth(api_key)
+                    .json(&serde_json::json!({
+                        "from": from,
+                        "to": [to],
+                        "subject": subject,
+                        "text": text,
+                    }))
+                    .send()
+                    .await?;
+                if !response.status().is_success() {
+                    let status = response.status();
+                    anyhow::bail!("resend notification failed: {status}");
+                }
+                Ok(())
+            }
+        }
+    }
+
     pub async fn send_magic_link(
         &self,
         to: &str,

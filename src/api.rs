@@ -25,13 +25,20 @@ pub struct AppState {
     pub mailer: Mailer,
     pub base_url: String,
     pub login_rate: tokio::sync::Mutex<auth::RateLimiter>,
+    /// Email/webhook config keyed "acct:<id>", matching the index's
+    /// pseudo-device watch rows; refreshed with the index.
+    pub channels: RwLock<std::collections::HashMap<String, db::AccountChannels>>,
+    /// Outbound webhook client
+    pub http: reqwest::Client,
 }
 
 impl AppState {
     pub async fn rebuild_index(&self) -> anyhow::Result<()> {
         let devices = db::load_devices(&self.pool).await?;
         let watches = db::load_effective_watches(&self.pool).await?;
+        let channels = db::load_account_channels(&self.pool).await?;
         *self.index.write().await = WatchIndex::build(devices, watches);
+        *self.channels.write().await = channels;
         Ok(())
     }
 }

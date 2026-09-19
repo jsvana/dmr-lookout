@@ -48,4 +48,23 @@ get a push when they key up.</p>
 </div>
 {% endfor %}
 <p class="muted">Changes apply to every device signed in to this account.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Notification channels</h2>
+  <p class="muted">Besides iOS push, deliver each notification by email
+  and/or POST it as JSON to a webhook. Same cooldown and hourly caps apply.</p>
+  <form method="post" action="/settings/notifications">
+    <label style="display:flex;align-items:center;gap:8px;font-size:15px;color:var(--text)">
+      <input type="checkbox" name="notify_email" {% if notify_email %}checked{% endif %}>
+      Email me at {{ email }}
+    </label>
+    <div style="margin-top:12px">
+      <label>Webhook URL <span class="muted">(blank = off)</span></label>
+      <input type="text" name="webhook_url" value="{{ webhook_url }}"
+             inputmode="url" autocapitalize="off" autocomplete="off"
+             placeholder="https://example.com/hook">
+    </div>
+    <div class="watch-actions"><button type="submit">Save channels</button></div>
+  </form>
+</div>
 {% endblock %}

@@ -60,6 +60,8 @@ async fn main() -> anyhow::Result<()> {
         mailer,
         base_url: config.web.base_url.clone(),
         login_rate: tokio::sync::Mutex::new(auth::RateLimiter::default()),
+        channels: tokio::sync::RwLock::new(std::collections::HashMap::new()),
+        http: reqwest::Client::new(),
     });
     state.rebuild_index().await?;
 
@@ -118,34 +120,66 @@ async fn matcher(state: Arc<AppState>, params: RuleParams, mut events: mpsc::Rec
         let now = chrono::Utc::now().timestamp();
         let connected_at = state.feed.connected_at.load(Ordering::Relaxed);
 
-        // Collect decisions under the read lock, send after releasing it
+        // Collect decisions under the read locks, send after releasing them
         let mut jobs = Vec::new();
+        let mut channel_jobs = Vec::new();
         {
             let index = state.index.read().await;
+            let channels = state.channels.read().await;
             for matched in index.matches(&event) {
-                let Some(device) = index.devices.get(&matched.device_id) else {
-                    continue;
-                };
                 let key = matched.key();
-                let window = hourly.entry(device.id.clone()).or_default();
+                // "acct:<id>" rows are email/webhook deliveries, one per
+                // account per event, sharing the device rules (no quiet
+                // hours — accounts have none)
+                let (decider, is_channel) = match index.devices.get(&matched.device_id) {
+                    Some(device) => (device.clone(), false),
+                    None => {
+                        let Some(config) = channels.get(&matched.device_id) else {
+                            continue;
+                        };
+                        (
+                            watch::Device {
+                                id: matched.device_id.clone(),
+                                apns_token: String::new(),
+                                apns_env: String::new(),
+                                account_id: Some(config.account_id),
+                                quiet_start: None,
+                                quiet_end: None,
+                                tz: String::new(),
+                            },
+                            true,
+                        )
+                    }
+                };
+                let window = hourly.entry(decider.id.clone()).or_default();
                 while window.front().is_some_and(|t| now - t > 3600) {
                     window.pop_front();
                 }
                 let decision = watch::decide(
                     &event,
-                    device,
+                    &decider,
                     &params,
                     now,
                     connected_at,
-                    cooldowns.get(&(device.id.clone(), key.clone())).copied(),
+                    cooldowns.get(&(decider.id.clone(), key.clone())).copied(),
                     window.len(),
                 );
                 match decision {
+                    Ok(()) if is_channel => {
+                        let config = channels[&matched.device_id].clone();
+                        channel_jobs.push(ChannelJob {
+                            acct_key: matched.device_id.clone(),
+                            config,
+                            key,
+                            watch_call: matched.callsign.clone(),
+                            watch_label: matched.label.clone(),
+                        });
+                    }
                     Ok(()) => jobs.push(PushJob {
-                        device_id: device.id.clone(),
-                        token: device.apns_token.clone(),
-                        apns_env: device.apns_env.clone(),
-                        account_id: device.account_id,
+                        device_id: decider.id.clone(),
+                        token: decider.apns_token.clone(),
+                        apns_env: decider.apns_env.clone(),
+                        account_id: decider.account_id,
                         key,
                         watch_call: matched.callsign.clone(),
                         watch_label: matched.label.clone(),
@@ -198,6 +232,7 @@ async fn matcher(state: Arc<AppState>, params: RuleParams, mut events: mpsc::Rec
                 &state.pool,
                 &job.device_id,
                 job.account_id,
+                "apns",
                 &call,
                 event.source_id,
                 event.destination_id,
@@ -228,7 +263,132 @@ async fn matcher(state: Arc<AppState>, params: RuleParams, mut events: mpsc::Rec
                 }
             }
         }
+
+        // Email/webhook deliveries: one per account per event
+        for job in channel_jobs {
+            let call = display_call(&event, &job.watch_call);
+            let buddy = if job.watch_label.is_empty() {
+                call.clone()
+            } else {
+                format!("{call} ({})", job.watch_label)
+            };
+            let talkgroup = match &event.destination_name {
+                Some(name) if !name.is_empty() => {
+                    format!("{name} (TG {})", event.destination_id)
+                }
+                _ => format!("TG {}", event.destination_id),
+            };
+            let mut any_delivered = false;
+
+            if job.config.notify_email {
+                let history_url = format!("{}/history", state.base_url.trim_end_matches('/'));
+                let outcome = match state
+                    .mailer
+                    .send_notification(&job.config.email, &buddy, &talkgroup, &history_url)
+                    .await
+                {
+                    Ok(()) => {
+                        any_delivered = true;
+                        "delivered"
+                    }
+                    Err(error) => {
+                        tracing::warn!(%error, "notification email failed");
+                        "failed"
+                    }
+                };
+                let _ = db::log_notification(
+                    &state.pool,
+                    &job.acct_key,
+                    Some(job.config.account_id),
+                    "email",
+                    &call,
+                    event.source_id,
+                    event.destination_id,
+                    event.destination_name.as_deref().unwrap_or(""),
+                    if event.start > 0 { event.start } else { now },
+                    now,
+                    outcome,
+                )
+                .await;
+            }
+
+            if !job.config.webhook_url.is_empty() {
+                let payload = serde_json::json!({
+                    "callsign": call,
+                    "label": job.watch_label,
+                    "dmr_id": event.source_id,
+                    "talkgroup": event.destination_id,
+                    "talkgroup_name": event.destination_name.as_deref().unwrap_or(""),
+                    "event_time": if event.start > 0 { event.start } else { now },
+                });
+                let sent = state
+                    .http
+                    .post(&job.config.webhook_url)
+                    .json(&payload)
+                    .timeout(std::time::Duration::from_secs(10))
+                    .send()
+                    .await;
+                let outcome = match sent {
+                    Ok(response) if response.status().is_success() => {
+                        any_delivered = true;
+                        "delivered"
+                    }
+                    Ok(response) => {
+                        tracing::warn!(status = %response.status(), "webhook rejected");
+                        "failed"
+                    }
+                    Err(error) => {
+                        tracing::warn!(%error, "webhook failed");
+                        "failed"
+                    }
+                };
+                let _ = db::log_notification(
+                    &state.pool,
+                    &job.acct_key,
+                    Some(job.config.account_id),
+                    "webhook",
+                    &call,
+                    event.source_id,
+                    event.destination_id,
+                    event.destination_name.as_deref().unwrap_or(""),
+                    if event.start > 0 { event.start } else { now },
+                    now,
+                    outcome,
+                )
+                .await;
+            }
+
+            if any_delivered {
+                tracing::info!(call = %call, account = job.config.account_id, "channel notified");
+                cooldowns.insert((job.acct_key.clone(), job.key.clone()), now);
+                hourly
+                    .entry(job.acct_key.clone())
+                    .or_default()
+                    .push_back(now);
+                let _ = db::record_push(&state.pool, &job.acct_key, &job.key, now).await;
+            }
+        }
     }
+}
+
+/// Open Terminal (app-only) transmissions ship a blank SourceCall; fall
+/// back to the watch's own callsign, then the raw DMR ID.
+fn display_call(event: &LhEvent, watch_call: &str) -> String {
+    if !event.source_call.is_empty() {
+        event.source_call.clone()
+    } else if !watch_call.is_empty() {
+        watch_call.to_string()
+    } else {
+        format!("DMR {}", event.source_id)
+    }
+}
+
+struct ChannelJob {
+    acct_key: String,
+    config: db::AccountChannels,
+    key: String,
+    watch_call: String,
+    watch_label: String,
 }
 
 struct PushJob {

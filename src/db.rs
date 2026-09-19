@@ -54,7 +54,9 @@ fn row_to_watch(row: sqlx::sqlite::SqliteRow) -> Watch {
 }
 
 /// The watches the matcher indexes: per-device lists for unclaimed
-/// devices, plus the account list fanned out to every claimed device.
+/// devices, the account list fanned out to every claimed device, and one
+/// "acct:<id>" row per account watch where email/webhook delivery is on —
+/// so channel notifications fire even for accounts with no devices.
 pub async fn load_effective_watches(pool: &SqlitePool) -> anyhow::Result<Vec<Watch>> {
     let rows = sqlx::query(
         "SELECT w.device_id, w.callsign, w.dmr_id, w.label, w.tgs
@@ -62,11 +64,80 @@ pub async fn load_effective_watches(pool: &SqlitePool) -> anyhow::Result<Vec<Wat
          WHERE d.account_id IS NULL
          UNION ALL
          SELECT d.id AS device_id, aw.callsign, aw.dmr_id, aw.label, aw.tgs
-         FROM account_watches aw JOIN devices d ON d.account_id = aw.account_id",
+         FROM account_watches aw JOIN devices d ON d.account_id = aw.account_id
+         UNION ALL
+         SELECT 'acct:' || a.id AS device_id, aw.callsign, aw.dmr_id, aw.label, aw.tgs
+         FROM account_watches aw JOIN accounts a ON a.id = aw.account_id
+         WHERE a.notify_email != 0 OR a.webhook_url != ''",
     )
     .fetch_all(pool)
     .await?;
     Ok(rows.into_iter().map(row_to_watch).collect())
+}
+
+/// Channel config for accounts with email/webhook delivery enabled,
+/// keyed by "acct:<id>" to match the index's pseudo-device rows.
+#[derive(Debug, Clone)]
+pub struct AccountChannels {
+    pub account_id: i64,
+    pub email: String,
+    pub notify_email: bool,
+    pub webhook_url: String,
+}
+
+pub async fn load_account_channels(
+    pool: &SqlitePool,
+) -> anyhow::Result<std::collections::HashMap<String, AccountChannels>> {
+    let rows = sqlx::query(
+        "SELECT id, email, notify_email, webhook_url FROM accounts
+         WHERE notify_email != 0 OR webhook_url != ''",
+    )
+    .fetch_all(pool)
+    .await?;
+    Ok(rows
+        .into_iter()
+        .map(|row| {
+            let id: i64 = row.get("id");
+            (
+                format!("acct:{id}"),
+                AccountChannels {
+                    account_id: id,
+                    email: row.get("email"),
+                    notify_email: row.get::<i64, _>("notify_email") != 0,
+                    webhook_url: row.get("webhook_url"),
+                },
+            )
+        })
+        .collect())
+}
+
+pub async fn account_channel_settings(
+    pool: &SqlitePool,
+    account_id: i64,
+) -> anyhow::Result<(bool, String)> {
+    let row = sqlx::query("SELECT notify_email, webhook_url FROM accounts WHERE id = ?1")
+        .bind(account_id)
+        .fetch_one(pool)
+        .await?;
+    Ok((
+        row.get::<i64, _>("notify_email") != 0,
+        row.get("webhook_url"),
+    ))
+}
+
+pub async fn set_account_channels(
+    pool: &SqlitePool,
+    account_id: i64,
+    notify_email: bool,
+    webhook_url: &str,
+) -> anyhow::Result<()> {
+    sqlx::query("UPDATE accounts SET notify_email = ?2, webhook_url = ?3 WHERE id = ?1")
+        .bind(account_id)
+        .bind(notify_email as i64)
+        .bind(webhook_url)
+        .execute(pool)
+        .await?;
+    Ok(())
 }
 
 pub async fn load_device_watches(pool: &SqlitePool, device_id: &str) -> anyhow::Result<Vec<Watch>> {
@@ -512,6 +583,7 @@ pub struct HistoryRow {
     pub talkgroup: u32,
     pub talkgroup_name: String,
     pub device_id: String,
+    pub channel: String,
     pub sent_at: i64,
     pub outcome: String,
 }
@@ -521,6 +593,7 @@ pub async fn log_notification(
     pool: &SqlitePool,
     device_id: &str,
     account_id: Option<i64>,
+    channel: &str,
     callsign: &str,
     dmr_id: u32,
     talkgroup: u32,
@@ -531,12 +604,13 @@ pub async fn log_notification(
 ) -> anyhow::Result<()> {
     sqlx::query(
         "INSERT INTO notification_log
-           (device_id, account_id, callsign, dmr_id, talkgroup, talkgroup_name,
+           (device_id, account_id, channel, callsign, dmr_id, talkgroup, talkgroup_name,
             event_time, sent_at, outcome)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
     )
     .bind(device_id)
     .bind(account_id)
+    .bind(channel)
     .bind(callsign)
     .bind(dmr_id as i64)
     .bind(talkgroup as i64)
@@ -558,7 +632,8 @@ pub async fn load_history(
     offset: i64,
 ) -> anyhow::Result<Vec<HistoryRow>> {
     let rows = sqlx::query(
-        "SELECT callsign, dmr_id, talkgroup, talkgroup_name, device_id, sent_at, outcome
+        "SELECT callsign, dmr_id, talkgroup, talkgroup_name, device_id, channel,
+                sent_at, outcome
          FROM notification_log
          WHERE account_id = ?1
             OR device_id IN (SELECT id FROM devices WHERE account_id = ?1)
@@ -578,6 +653,7 @@ pub async fn load_history(
             talkgroup: row.get::<i64, _>("talkgroup") as u32,
             talkgroup_name: row.get("talkgroup_name"),
             device_id: row.get("device_id"),
+            channel: row.get("channel"),
             sent_at: row.get("sent_at"),
             outcome: row.get("outcome"),
         })
@@ -760,6 +836,7 @@ mod tests {
             &pool,
             "dev1",
             None,
+            "apns",
             "W6JY",
             1,
             91,
@@ -776,6 +853,7 @@ mod tests {
             &pool,
             "dev1",
             Some(account_id),
+            "apns",
             "K6AAA",
             2,
             91,
@@ -797,6 +875,37 @@ mod tests {
         let rows = load_history(&pool, account_id, 10, 0).await.unwrap();
         assert_eq!(rows.len(), 1);
         assert_eq!(rows[0].callsign, "K6AAA");
+    }
+
+    #[tokio::test]
+    async fn channel_settings_create_acct_watch_rows() {
+        let pool = open_memory().await;
+        let account_id = find_or_create_account(&pool, "a@b.co", 100).await.unwrap();
+        insert_account_watch(&pool, account_id, "W6JY", 0, "", &[])
+            .await
+            .unwrap();
+
+        // Channels off: no acct rows, no channel configs
+        assert!(load_effective_watches(&pool).await.unwrap().is_empty());
+        assert!(load_account_channels(&pool).await.unwrap().is_empty());
+
+        set_account_channels(&pool, account_id, true, "https://example.com/hook")
+            .await
+            .unwrap();
+        assert_eq!(
+            account_channel_settings(&pool, account_id).await.unwrap(),
+            (true, "https://example.com/hook".to_string())
+        );
+        // Even with zero devices, the account watch now matches via its
+        // acct: pseudo-device row
+        let effective = load_effective_watches(&pool).await.unwrap();
+        assert_eq!(effective.len(), 1);
+        assert_eq!(effective[0].device_id, format!("acct:{account_id}"));
+        let channels = load_account_channels(&pool).await.unwrap();
+        let config = &channels[&format!("acct:{account_id}")];
+        assert!(config.notify_email);
+        assert_eq!(config.email, "a@b.co");
+        assert_eq!(config.webhook_url, "https://example.com/hook");
     }
 
     #[tokio::test]
