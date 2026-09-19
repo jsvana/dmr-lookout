@@ -1,10 +1,13 @@
 mod api;
+mod auth;
 mod config;
 mod db;
+mod email;
 mod event;
 mod feed;
 mod push;
 mod watch;
+mod web;
 
 use api::AppState;
 use event::LhEvent;
@@ -19,13 +22,11 @@ use watch::{RuleParams, Suppression};
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()
         .with_env_filter(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "info".into()),
+            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "info".into()),
         )
         .init();
 
-    let config_path =
-        std::env::var("LOOKOUT_CONFIG").unwrap_or_else(|_| "config.toml".to_string());
+    let config_path = std::env::var("LOOKOUT_CONFIG").unwrap_or_else(|_| "config.toml".to_string());
     let config = config::Config::load(&config_path)?;
     let api_token = config::api_token()?;
 
@@ -41,6 +42,12 @@ async fn main() -> anyhow::Result<()> {
         }
     };
 
+    let resend_key = config::resend_key();
+    if resend_key.is_none() {
+        tracing::warn!("no LOOKOUT_RESEND_KEY; magic links will be logged, not emailed");
+    }
+    let mailer = email::Mailer::new(resend_key, &config.web.email_from);
+
     let pool = db::open(&config.db.path).await?;
     let feed_status = feed::FeedStatus::new();
     let state = Arc::new(AppState {
@@ -50,8 +57,14 @@ async fn main() -> anyhow::Result<()> {
         push: push_client.clone(),
         api_token,
         started_at: chrono::Utc::now().timestamp(),
+        mailer,
+        base_url: config.web.base_url.clone(),
+        login_rate: tokio::sync::Mutex::new(auth::RateLimiter::default()),
     });
     state.rebuild_index().await?;
+
+    // History retention + expired session/token cleanup
+    tokio::spawn(maintenance(pool.clone()));
 
     let (events_tx, events_rx) = mpsc::channel::<LhEvent>(1024);
     tokio::spawn(feed::run(
@@ -59,12 +72,29 @@ async fn main() -> anyhow::Result<()> {
         feed_status.clone(),
         events_tx,
     ));
-    tokio::spawn(matcher(state.clone(), config.rules.clone().into(), events_rx));
+    tokio::spawn(matcher(
+        state.clone(),
+        config.rules.clone().into(),
+        events_rx,
+    ));
 
     let listener = tokio::net::TcpListener::bind(&config.server.bind).await?;
     tracing::info!(bind = %config.server.bind, "listening");
     axum::serve(listener, api::router(state)).await?;
     Ok(())
+}
+
+/// Every 6 hours: drop notification history past 90 days plus expired
+/// sessions and magic-link tokens.
+async fn maintenance(pool: sqlx::SqlitePool) {
+    const HISTORY_RETENTION_SECS: i64 = 90 * 24 * 3600;
+    loop {
+        let now = chrono::Utc::now().timestamp();
+        if let Err(error) = db::prune(&pool, now, HISTORY_RETENTION_SECS).await {
+            tracing::warn!(%error, "prune failed");
+        }
+        tokio::time::sleep(std::time::Duration::from_secs(6 * 3600)).await;
+    }
 }
 
 impl From<config::RulesConfig> for RuleParams {
@@ -111,14 +141,15 @@ async fn matcher(state: Arc<AppState>, params: RuleParams, mut events: mpsc::Rec
                     window.len(),
                 );
                 match decision {
-                    Ok(()) => jobs.push((
-                        device.id.clone(),
-                        device.apns_token.clone(),
-                        device.apns_env.clone(),
+                    Ok(()) => jobs.push(PushJob {
+                        device_id: device.id.clone(),
+                        token: device.apns_token.clone(),
+                        apns_env: device.apns_env.clone(),
+                        account_id: device.account_id,
                         key,
-                        matched.callsign.clone(),
-                        matched.label.clone(),
-                    )),
+                        watch_call: matched.callsign.clone(),
+                        watch_label: matched.label.clone(),
+                    }),
                     Err(Suppression::Cooldown) | Err(Suppression::Inactive) => {}
                     Err(reason) => {
                         tracing::debug!(call = %event.source_call, ?reason, "suppressed");
@@ -127,7 +158,7 @@ async fn matcher(state: Arc<AppState>, params: RuleParams, mut events: mpsc::Rec
             }
         }
 
-        for (device_id, token, apns_env, key, watch_call, watch_label) in jobs {
+        for job in jobs {
             let Some(push) = state.push.as_ref() else {
                 tracing::info!(call = %event.source_call, "match (push disabled)");
                 continue;
@@ -135,10 +166,10 @@ async fn matcher(state: Arc<AppState>, params: RuleParams, mut events: mpsc::Rec
             // Open Terminal (app-only) transmissions ship a blank SourceCall;
             // the watch knows who it matched, so fall back to its own data
             let call = if event.source_call.is_empty() {
-                if watch_call.is_empty() {
+                if job.watch_call.is_empty() {
                     format!("DMR {}", event.source_id)
                 } else {
-                    watch_call
+                    job.watch_call.clone()
                 }
             } else {
                 event.source_call.clone()
@@ -146,7 +177,7 @@ async fn matcher(state: Arc<AppState>, params: RuleParams, mut events: mpsc::Rec
             let name = event
                 .source_name
                 .clone()
-                .or_else(|| (!watch_label.is_empty()).then(|| watch_label.clone()));
+                .or_else(|| (!job.watch_label.is_empty()).then(|| job.watch_label.clone()));
             let payload = build_payload(
                 &call,
                 name.as_deref(),
@@ -155,17 +186,41 @@ async fn matcher(state: Arc<AppState>, params: RuleParams, mut events: mpsc::Rec
                 event.destination_name.as_deref(),
             );
             let collapse = format!("buddy-{call}");
-            match push.send(&token, &payload, &collapse, &apns_env).await {
+            let outcome = push
+                .send(&job.token, &payload, &collapse, &job.apns_env)
+                .await;
+            let outcome_label = match &outcome {
+                SendOutcome::Delivered => "delivered",
+                SendOutcome::DeadToken => "dead_token",
+                SendOutcome::Failed(_) => "failed",
+            };
+            let _ = db::log_notification(
+                &state.pool,
+                &job.device_id,
+                job.account_id,
+                &call,
+                event.source_id,
+                event.destination_id,
+                event.destination_name.as_deref().unwrap_or(""),
+                if event.start > 0 { event.start } else { now },
+                now,
+                outcome_label,
+            )
+            .await;
+            match outcome {
                 SendOutcome::Delivered => {
                     tracing::info!(call = %event.source_call, tg = event.destination_id,
-                        device = %device_id, "pushed");
-                    cooldowns.insert((device_id.clone(), key.clone()), now);
-                    hourly.entry(device_id.clone()).or_default().push_back(now);
-                    let _ = db::record_push(&state.pool, &device_id, &key, now).await;
+                        device = %job.device_id, "pushed");
+                    cooldowns.insert((job.device_id.clone(), job.key.clone()), now);
+                    hourly
+                        .entry(job.device_id.clone())
+                        .or_default()
+                        .push_back(now);
+                    let _ = db::record_push(&state.pool, &job.device_id, &job.key, now).await;
                 }
                 SendOutcome::DeadToken => {
-                    tracing::info!(device = %device_id, "dead token, pruning device");
-                    let _ = db::delete_device_by_token(&state.pool, &token).await;
+                    tracing::info!(device = %job.device_id, "dead token, pruning device");
+                    let _ = db::delete_device_by_token(&state.pool, &job.token).await;
                     let _ = state.rebuild_index().await;
                 }
                 SendOutcome::Failed(reason) => {
@@ -174,4 +229,14 @@ async fn matcher(state: Arc<AppState>, params: RuleParams, mut events: mpsc::Rec
             }
         }
     }
+}
+
+struct PushJob {
+    device_id: String,
+    token: String,
+    apns_env: String,
+    account_id: Option<i64>,
+    key: String,
+    watch_call: String,
+    watch_label: String,
 }

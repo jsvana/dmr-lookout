@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Sign in — DMR Lookout{% endblock %}
+{% block content %}
+{% if sent %}
+<div class="card">
+  <h2>Check your email</h2>
+  <p>If that address is valid, a sign-in link is on its way. It expires in
+  15 minutes and works once.</p>
+  <p class="muted">Wrong address? <a href="/login">Start over</a>.</p>
+</div>
+{% else %}
+{% if error != "" %}<div class="flash err">{{ error }}</div>{% endif %}
+<div class="card">
+  <h2>Sign in</h2>
+  <p class="muted">Enter your email and we'll send you a magic link —
+  no password needed.</p>
+  <form method="post" action="/login">
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" required autocomplete="email"
+           inputmode="email" placeholder="you@example.com">
+    <div style="margin-top:12px"><button type="submit">Email me a link</button></div>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Watches — DMR Lookout{% endblock %}
+{% block nav %}{% include "nav.html" %}{% endblock %}
+{% block content %}
+{% if flash != "" %}<div class="flash">{{ flash }}</div>{% endif %}
+
+<div class="card">
+  <h2 style="margin-top:0">Add a watch</h2>
+  <form method="post" action="/watches/add">
+    <div class="watch-grid">
+      <div><label>Callsign</label>
+        <input type="text" name="callsign" placeholder="W6JY" autocapitalize="characters" autocomplete="off"></div>
+      <div><label>DMR ID</label>
+        <input type="text" name="dmr_id" inputmode="numeric" placeholder="3121234"></div>
+      <div><label>Label</label>
+        <input type="text" name="label" placeholder="Jay"></div>
+      <div><label>Talkgroups <span class="muted">(blank = any)</span></label>
+        <input type="text" name="talkgroups" inputmode="numeric" placeholder="3100, 91"></div>
+    </div>
+    <div class="watch-actions"><button type="submit">Add watch</button></div>
+  </form>
+</div>
+
+<h2>Your watches <span class="muted">({{ watches.len() }})</span></h2>
+{% if watches.is_empty() %}
+<p class="muted">No watches yet — add a callsign or DMR ID above and you'll
+get a push when they key up.</p>
+{% endif %}
+{% for watch in watches %}
+<div class="card">
+  <form method="post" action="/watches/{{ watch.id }}/update">
+    <div class="watch-grid">
+      <div><label>Callsign</label>
+        <input type="text" name="callsign" value="{{ watch.callsign }}" autocapitalize="characters" autocomplete="off"></div>
+      <div><label>DMR ID</label>
+        <input type="text" name="dmr_id" inputmode="numeric" value="{{ watch.dmr_id }}"></div>
+      <div><label>Label</label>
+        <input type="text" name="label" value="{{ watch.label }}"></div>
+      <div><label>Talkgroups <span class="muted">(blank = any)</span></label>
+        <input type="text" name="talkgroups" inputmode="numeric" value="{{ watch.talkgroups }}"></div>
+    </div>
+    <div class="watch-actions">
+      <button type="submit">Save</button>
+      <button type="submit" class="danger"
+              formaction="/watches/{{ watch.id }}/delete">Delete</button>
+    </div>
+  </form>
+</div>
+{% endfor %}
+<p class="muted">Changes apply to every device signed in to this account.</p>
+{% endblock %}

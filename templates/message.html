@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} — DMR Lookout{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>{{ title }}</h2>
+  <p>{{ body }}</p>
+  <p><a href="{{ link_href }}">{{ link_label }}</a></p>
+</div>
+{% endblock %}

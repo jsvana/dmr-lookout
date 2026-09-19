@@ -1,5 +1,6 @@
-# Copy to config.toml. The API bearer token comes from the environment:
+# Copy to config.toml. Secrets come from the environment:
 #   LOOKOUT_API_TOKEN=...   (required)
+#   LOOKOUT_RESEND_KEY=...  (optional; without it magic links are logged, not emailed)
 #   LOOKOUT_CONFIG=...      (optional, path to this file)
 
 [server]
@@ -26,3 +27,9 @@ connect_grace_secs = 10
 
 [db]
 path = "data/lookout.db"
+
+# Web UI + magic-link login. base_url is what goes in emailed links and
+# controls the Secure cookie flag (https = Secure).
+[web]
+base_url = "https://dmr.carrierwave.app"
+email_from = "DMR Lookout <lookout@carrierwave.app>"

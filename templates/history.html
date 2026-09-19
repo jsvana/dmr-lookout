@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}History — DMR Lookout{% endblock %}
+{% block nav %}{% include "nav.html" %}{% endblock %}
+{% block content %}
+<h2>Notification history</h2>
+{% if rows.is_empty() %}
+<p class="muted">Nothing yet. When a watched buddy keys up and a push goes
+out, it shows here.</p>
+{% else %}
+<table class="history">
+  <thead>
+    <tr><th>When</th><th>Buddy</th><th>Talkgroup</th><th>Device</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+  {% for row in rows %}
+    <tr>
+      <td data-label="When">{{ row.when }}</td>
+      <td data-label="Buddy">{{ row.buddy }}</td>
+      <td data-label="Talkgroup">{{ row.talkgroup }}</td>
+      <td data-label="Device">{{ row.device }}</td>
+      <td data-label="Status"><span class="badge {{ row.outcome }}">{{ row.outcome }}</span></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+<div class="pager">
+  <span>{% if page > 1 %}<a href="/history?page={{ page - 1 }}">&larr; Newer</a>{% endif %}</span>
+  <span>{% if has_more %}<a href="/history?page={{ page + 1 }}">Older &rarr;</a>{% endif %}</span>
+</div>
+{% endblock %}

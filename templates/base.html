@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}DMR Lookout{% endblock %}</title>
+<style>
+:root {
+  --bg: #f6f7f9; --card: #ffffff; --text: #1b1e23; --muted: #667085;
+  --accent: #1a73e8; --border: #e0e3e8; --danger: #c0392b; --ok: #1e8e3e;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161a; --card: #1e2126; --text: #e8eaed; --muted: #9aa0a6;
+    --accent: #6ea8fe; --border: #33373d; --danger: #e5736a; --ok: #6bcb8b;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
+header.site {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 12px 0; margin-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+header.site h1 { font-size: 18px; margin: 0; }
+header.site nav { display: flex; gap: 14px; margin-left: auto; align-items: center; }
+header.site a { color: var(--accent); text-decoration: none; font-weight: 500; }
+header.site .email { color: var(--muted); font-size: 13px; }
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; margin: 12px 0;
+}
+.flash { border-left: 4px solid var(--ok); padding: 10px 14px; margin: 12px 0;
+  background: var(--card); border-radius: 6px; }
+.flash.err { border-left-color: var(--danger); }
+label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 2px; }
+input[type=text], input[type=email], input[type=number] {
+  width: 100%; padding: 9px 10px; border: 1px solid var(--border);
+  border-radius: 6px; background: var(--bg); color: var(--text); font-size: 15px;
+}
+button {
+  padding: 9px 16px; border: 0; border-radius: 6px; background: var(--accent);
+  color: #fff; font-size: 15px; font-weight: 600; cursor: pointer;
+}
+button.danger { background: transparent; color: var(--danger);
+  border: 1px solid var(--danger); font-weight: 500; }
+button.secondary { background: transparent; color: var(--accent);
+  border: 1px solid var(--accent); font-weight: 500; }
+.watch-grid {
+  display: grid; gap: 10px;
+  grid-template-columns: 1fr 1fr;
+}
+.watch-grid .full { grid-column: 1 / -1; }
+.watch-actions { display: flex; gap: 8px; margin-top: 10px; }
+.muted { color: var(--muted); font-size: 13px; }
+table.history { width: 100%; border-collapse: collapse; }
+table.history th, table.history td {
+  text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+table.history th { color: var(--muted); font-weight: 500; font-size: 13px; }
+.pager { display: flex; gap: 12px; justify-content: space-between; margin: 16px 0; }
+.badge { font-size: 12px; padding: 2px 8px; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--muted); }
+.badge.delivered { color: var(--ok); border-color: var(--ok); }
+.badge.failed, .badge.dead_token { color: var(--danger); border-color: var(--danger); }
+/* Mobile: history table collapses to cards */
+@media (max-width: 560px) {
+  table.history thead { display: none; }
+  table.history, table.history tbody, table.history tr, table.history td { display: block; }
+  table.history tr { border: 1px solid var(--border); border-radius: 10px;
+    margin: 10px 0; padding: 8px 4px; background: var(--card); }
+  table.history td { border: 0; padding: 3px 12px; }
+  table.history td::before { content: attr(data-label); display: inline-block;
+    width: 7em; color: var(--muted); font-size: 13px; }
+}
+@media (min-width: 561px) {
+  .watch-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .watch-grid .full { grid-column: auto; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="site">
+  <h1>DMR Lookout</h1>
+  {% block nav %}{% endblock %}
+</header>
+{% block content %}{% endblock %}
+</div>
+</body>
+</html>

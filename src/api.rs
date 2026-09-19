@@ -3,7 +3,7 @@
 use crate::event::normalize_call;
 use crate::push::{build_test_payload, PushClient, SendOutcome};
 use crate::watch::{Watch, WatchIndex};
-use crate::{db, feed::FeedStatus};
+use crate::{auth, db, email::Mailer, feed::FeedStatus, web};
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
@@ -22,12 +22,15 @@ pub struct AppState {
     pub push: Option<Arc<PushClient>>,
     pub api_token: String,
     pub started_at: i64,
+    pub mailer: Mailer,
+    pub base_url: String,
+    pub login_rate: tokio::sync::Mutex<auth::RateLimiter>,
 }
 
 impl AppState {
     pub async fn rebuild_index(&self) -> anyhow::Result<()> {
         let devices = db::load_devices(&self.pool).await?;
-        let watches = db::load_watches(&self.pool).await?;
+        let watches = db::load_effective_watches(&self.pool).await?;
         *self.index.write().await = WatchIndex::build(devices, watches);
         Ok(())
     }
@@ -42,8 +45,9 @@ pub fn router(state: Arc<AppState>) -> Router {
             "/v1/devices/:id/watches",
             get(list_watches).put(put_watches),
         )
-        .route("/v1/devices/:id", axum::routing::delete(remove_device))
+        .route("/v1/devices/:id", get(device_info).delete(remove_device))
         .route("/v1/devices/:id/test", post(test_push))
+        .route("/v1/auth/request", post(auth_request))
         .route_layer(axum::middleware::from_fn_with_state(
             state.clone(),
             require_bearer,
@@ -51,7 +55,8 @@ pub fn router(state: Arc<AppState>) -> Router {
     Router::new()
         .route("/v1/health", get(health))
         .merge(protected)
-        .with_state(state)
+        .with_state(state.clone())
+        .merge(web::router(state))
 }
 
 async fn require_bearer(
@@ -113,8 +118,16 @@ async fn register_device(
         &state.pool,
         &body.device_id,
         &body.apns_token,
-        if body.apns_env == "production" { "production" } else { "sandbox" },
-        if body.platform.is_empty() { "ios" } else { &body.platform },
+        if body.apns_env == "production" {
+            "production"
+        } else {
+            "sandbox"
+        },
+        if body.platform.is_empty() {
+            "ios"
+        } else {
+            &body.platform
+        },
         &body.app_version,
         now,
     )
@@ -143,28 +156,53 @@ struct WatchBody {
     talkgroups: Vec<u32>,
 }
 
+/// Claimed devices read the account list; unclaimed keep their own.
 async fn list_watches(
     State(state): State<Arc<AppState>>,
     Path(device_id): Path<String>,
 ) -> Response {
-    match db::load_watches(&state.pool).await {
-        Ok(watches) => {
-            let list: Vec<WatchBody> = watches
-                .into_iter()
-                .filter(|watch| watch.device_id == device_id)
-                .map(|watch| WatchBody {
-                    callsign: watch.callsign,
-                    dmr_id: watch.dmr_id,
-                    label: watch.label,
-                    talkgroups: watch.talkgroups,
+    let account = match db::device_account(&state.pool, &device_id).await {
+        Ok(account) => account,
+        Err(_) => return StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+    };
+    let list: anyhow::Result<Vec<WatchBody>> = match account {
+        Some(account_id) => {
+            db::load_account_watches(&state.pool, account_id)
+                .await
+                .map(|watches| {
+                    watches
+                        .into_iter()
+                        .map(|watch| WatchBody {
+                            callsign: watch.callsign,
+                            dmr_id: watch.dmr_id,
+                            label: watch.label,
+                            talkgroups: watch.talkgroups,
+                        })
+                        .collect()
                 })
-                .collect();
-            Json(list).into_response()
         }
+        None => db::load_device_watches(&state.pool, &device_id)
+            .await
+            .map(|watches| {
+                watches
+                    .into_iter()
+                    .map(|watch| WatchBody {
+                        callsign: watch.callsign,
+                        dmr_id: watch.dmr_id,
+                        label: watch.label,
+                        talkgroups: watch.talkgroups,
+                    })
+                    .collect()
+            }),
+    };
+    match list {
+        Ok(list) => Json(list).into_response(),
         Err(_) => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
     }
 }
 
+/// PUT replaces the whole list — the account's if the device is claimed,
+/// so old app builds keep working after sign-in.
 async fn put_watches(
     State(state): State<Arc<AppState>>,
     Path(device_id): Path<String>,
@@ -181,15 +219,83 @@ async fn put_watches(
             talkgroups: entry.talkgroups,
         })
         .collect();
-    match db::replace_watches(&state.pool, &device_id, &watches).await {
+    let account = match db::device_account(&state.pool, &device_id).await {
+        Ok(account) => account,
+        Err(_) => return StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+    };
+    let result = match account {
+        Some(account_id) => db::replace_account_watches(&state.pool, account_id, &watches).await,
+        None => db::replace_watches(&state.pool, &device_id, &watches).await,
+    };
+    match result {
         Ok(()) => {
             let _ = state.rebuild_index().await;
-            tracing::info!(device = %device_id, count = watches.len(), "watch list replaced");
+            tracing::info!(device = %device_id, count = watches.len(),
+                account = account.is_some(), "watch list replaced");
             StatusCode::NO_CONTENT.into_response()
         }
         Err(error) => {
             tracing::warn!(%error, "watch replace failed");
             StatusCode::INTERNAL_SERVER_ERROR.into_response()
+        }
+    }
+}
+
+/// Account status for the app to poll after requesting a claim link.
+async fn device_info(
+    State(state): State<Arc<AppState>>,
+    Path(device_id): Path<String>,
+) -> Response {
+    let exists = {
+        let index = state.index.read().await;
+        index.devices.contains_key(&device_id)
+    };
+    if !exists {
+        return (StatusCode::NOT_FOUND, "unknown device").into_response();
+    }
+    let account_id = db::device_account(&state.pool, &device_id)
+        .await
+        .ok()
+        .flatten();
+    let email = match account_id {
+        Some(id) => db::account_email(&state.pool, id).await.ok().flatten(),
+        None => None,
+    };
+    Json(serde_json::json!({
+        "device_id": device_id,
+        "claimed": account_id.is_some(),
+        "account_email": email,
+    }))
+    .into_response()
+}
+
+#[derive(Deserialize)]
+struct AuthRequestBody {
+    email: String,
+    device_id: String,
+}
+
+/// iOS sign-in: emails a magic link that, when clicked, attaches the
+/// device to the account and merges its watches.
+async fn auth_request(
+    State(state): State<Arc<AppState>>,
+    Json(body): Json<AuthRequestBody>,
+) -> Response {
+    let Some(email) = auth::normalize_email(&body.email) else {
+        return (StatusCode::BAD_REQUEST, "invalid email").into_response();
+    };
+    if body.device_id.is_empty() {
+        return (StatusCode::BAD_REQUEST, "device_id required").into_response();
+    }
+    let now = chrono::Utc::now().timestamp();
+    if !state.login_rate.lock().await.allow(&email, now) {
+        return (StatusCode::TOO_MANY_REQUESTS, "try again later").into_response();
+    }
+    match web::send_magic_link(&state, &email, Some(&body.device_id), now).await {
+        Ok(()) => StatusCode::ACCEPTED.into_response(),
+        Err(error) => {
+            tracing::warn!(%error, "claim link send failed");
+            StatusCode::BAD_GATEWAY.into_response()
         }
     }
 }
@@ -207,10 +313,7 @@ async fn remove_device(
     }
 }
 
-async fn test_push(
-    State(state): State<Arc<AppState>>,
-    Path(device_id): Path<String>,
-) -> Response {
+async fn test_push(State(state): State<Arc<AppState>>, Path(device_id): Path<String>) -> Response {
     let Some(push) = state.push.as_ref() else {
         return (StatusCode::SERVICE_UNAVAILABLE, "push not configured").into_response();
     };
@@ -223,7 +326,12 @@ async fn test_push(
     };
     let token = device.apns_token.clone();
     match push
-        .send(&token, &build_test_payload(), "buddy-test", &device.apns_env)
+        .send(
+            &token,
+            &build_test_payload(),
+            "buddy-test",
+            &device.apns_env,
+        )
         .await
     {
         SendOutcome::Delivered => StatusCode::NO_CONTENT.into_response(),

@@ -28,6 +28,7 @@ pub struct Device {
     pub id: String,
     pub apns_token: String,
     pub apns_env: String,
+    pub account_id: Option<i64>,
     pub quiet_start: Option<i64>,
     pub quiet_end: Option<i64>,
     pub tz: String,
@@ -87,8 +88,7 @@ impl WatchIndex {
             .flatten()
             .chain(self.by_id.get(&event.source_id).into_iter().flatten());
         for watch in candidates {
-            if !watch.talkgroups.is_empty() && !watch.talkgroups.contains(&event.destination_id)
-            {
+            if !watch.talkgroups.is_empty() && !watch.talkgroups.contains(&event.destination_id) {
                 continue;
             }
             if seen.insert((watch.device_id.clone(), watch.key())) {
@@ -203,6 +203,7 @@ mod tests {
             id: "dev1".into(),
             apns_token: "tok".into(),
             apns_env: "sandbox".into(),
+            account_id: None,
             quiet_start: None,
             quiet_end: None,
             tz: String::new(),
@@ -292,11 +293,7 @@ mod tests {
     #[test]
     fn cooldown_suppresses_then_expires() {
         let now = 100_000;
-        let base = (
-            event("W6JY", 1, 91, true, now),
-            device(),
-            params(),
-        );
+        let base = (event("W6JY", 1, 91, true, now), device(), params());
         let inside = decide(&base.0, &base.1, &base.2, now, 0, Some(now - 60), 0);
         assert_eq!(inside, Err(Suppression::Cooldown));
         let outside = decide(&base.0, &base.1, &base.2, now, 0, Some(now - 2000), 0);

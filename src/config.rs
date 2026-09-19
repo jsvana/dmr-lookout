@@ -11,6 +11,17 @@ pub struct Config {
     pub rules: RulesConfig,
     #[serde(default)]
     pub db: DbConfig,
+    #[serde(default)]
+    pub web: WebConfig,
+}
+
+#[derive(Deserialize, Clone)]
+pub struct WebConfig {
+    /// Public origin used in magic-link URLs and cookie security.
+    #[serde(default = "default_base_url")]
+    pub base_url: String,
+    #[serde(default = "default_email_from")]
+    pub email_from: String,
 }
 
 #[derive(Deserialize, Clone)]
@@ -79,6 +90,23 @@ fn default_db_path() -> String {
     "data/lookout.db".into()
 }
 
+fn default_base_url() -> String {
+    "http://127.0.0.1:8084".into()
+}
+
+fn default_email_from() -> String {
+    "DMR Lookout <lookout@carrierwave.app>".into()
+}
+
+impl Default for WebConfig {
+    fn default() -> Self {
+        WebConfig {
+            base_url: default_base_url(),
+            email_from: default_email_from(),
+        }
+    }
+}
+
 impl Default for ServerConfig {
     fn default() -> Self {
         ServerConfig {
@@ -125,6 +153,13 @@ impl Config {
 
 /// The single shared API bearer token; required.
 pub fn api_token() -> anyhow::Result<String> {
-    std::env::var("LOOKOUT_API_TOKEN")
-        .map_err(|_| anyhow::anyhow!("LOOKOUT_API_TOKEN must be set"))
+    std::env::var("LOOKOUT_API_TOKEN").map_err(|_| anyhow::anyhow!("LOOKOUT_API_TOKEN must be set"))
+}
+
+/// Resend API key; optional. Without it, magic links are logged instead
+/// of emailed (dev mode).
+pub fn resend_key() -> Option<String> {
+    std::env::var("LOOKOUT_RESEND_KEY")
+        .ok()
+        .filter(|k| !k.is_empty())
 }

@@ -98,11 +98,7 @@ fn nonempty(value: Option<&Value>) -> Option<String> {
 /// `/` or `-` (W6JY/P, W6JY-7 -> W6JY).
 pub fn normalize_call(call: &str) -> String {
     let upper = call.trim().to_uppercase();
-    upper
-        .split(['/', '-'])
-        .next()
-        .unwrap_or("")
-        .to_string()
+    upper.split(['/', '-']).next().unwrap_or("").to_string()
 }
 
 #[cfg(test)]
