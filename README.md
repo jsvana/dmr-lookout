@@ -23,8 +23,16 @@ DMRMonitor iOS app when a buddy keys up.
   15-min TTL, per-email rate limit) delivered via the Resend API; without
   `LOOKOUT_RESEND_KEY` links are logged instead (dev mode).
 - `web.rs` + `templates/` — server-rendered, mobile-friendly UI: email
-  sign-in, account watch editing, notification history (90-day retention,
-  pruned by a 6-hourly maintenance task). Plain form POSTs, no JS.
+  sign-in, account watch editing, notification channels, notification
+  history (90-day retention, pruned by a 6-hourly maintenance task).
+  Plain form POSTs, no JS.
+
+Beyond APNs, an account can turn on email delivery (to the account
+address) and/or a webhook: the server POSTs
+`{callsign, label, dmr_id, talkgroup, talkgroup_name, event_time}` as
+JSON. Channel notifications fire once per account per event — devices
+optional — under the same cooldown/hourly-cap rules, keyed `acct:<id>`
+in `notify_state`. Webhook URLs must be public http(s).
 
 ## Accounts
 
